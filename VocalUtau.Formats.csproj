@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -39,7 +40,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
+    <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />
+    <Compile Include="Model.USTs\Original\USTOriginalProject.cs" />
+    <Compile Include="Model.Utils\MathUtils.cs" />
+    <Compile Include="Model.VocalObject\BackerObject.cs" />
+    <Compile Include="Model.VocalObject\ControlPointObject.cs" />
+    <Compile Include="Model.VocalObject\NoteAtomObject.cs" />
+    <Compile Include="Model.VocalObject\NoteObject.cs" />
+    <Compile Include="Model.VocalObject\ObjectSerializer.cs" />
+    <Compile Include="Model.VocalObject\PartsObject.cs" />
+    <Compile Include="Model.VocalObject\ProjectObject.cs" />
+    <Compile Include="Model.VocalObject\SingerObject.cs" />
+    <Compile Include="Model.VocalObject\TrackerObject.cs" />
+    <Compile Include="Model.VocalObject\WaveObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model.Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

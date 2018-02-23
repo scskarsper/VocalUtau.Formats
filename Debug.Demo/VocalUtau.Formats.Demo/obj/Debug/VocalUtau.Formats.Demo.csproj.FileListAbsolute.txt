@@ -1,0 +1,10 @@
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\VocalUtau.Formats.Demo.exe
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\VocalUtau.Formats.Demo.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\VocalUtau.Formats.dll
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\VocalUtau.Formats.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.csprojResolveAssemblyReference.cache
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.Form1.resources
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.Properties.Resources.resources
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.csproj.GenerateResource.Cache
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.exe
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.pdb
