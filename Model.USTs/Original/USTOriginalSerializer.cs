@@ -150,10 +150,8 @@ namespace VocalUtau.Formats.Model.USTs.Original
                 long len = ust.Notes[i].Length;
                 if (ust.Notes[i].Lyric != "R")
                 {
-                    NoteObject no = new NoteObject();
-                    no.NoteNum = ust.Notes[i].NoteNum;
+                    NoteObject no = new NoteObject(stt, len, ust.Notes[i].NoteNum);
                     no.Lyric = ust.Notes[i].Lyric;
-                    no.TickLength = len;
                     no.PhonemeAtoms[0].Flags = ust.Notes[i].Flags;
                     no.PhonemeAtoms[0].Intensity = ust.Notes[i].Intensity;
                     no.PhonemeAtoms[0].Modulation = ust.Notes[i].Modulation;
@@ -162,7 +160,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
                     no.PhonemeAtoms[0].StartPoint = ust.Notes[i].StartPoint;
                     no.PhonemeAtoms[0].Velocity = ust.Notes[i].Velocity;
                     no.PhonemeAtoms[0].Envelopes.AddRange(ust.Notes[i].EnvelopAnalyse());
-                    po.NoteList.Add(stt,no);
+                    po.NoteList.Add(no);
                     TotalTick += ust.Notes[i].Length;// -ust.Notes[i].Overlap;
                 }
             }

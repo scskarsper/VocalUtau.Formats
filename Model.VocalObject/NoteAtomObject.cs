@@ -6,6 +6,7 @@ using System.Text;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
+    [Serializable]
     [DataContract]
     public class NoteAtomObject
     {

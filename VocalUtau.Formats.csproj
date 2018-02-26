@@ -50,6 +50,8 @@
     <Compile Include="Model.VocalObject\NoteObject.cs" />
     <Compile Include="Model.VocalObject\ObjectSerializer.cs" />
     <Compile Include="Model.VocalObject\PartsObject.cs" />
+    <Compile Include="Model.VocalObject\PitchObject.cs" />
+    <Compile Include="Model.VocalObject\PitchAtomObject.cs" />
     <Compile Include="Model.VocalObject\ProjectObject.cs" />
     <Compile Include="Model.VocalObject\SingerObject.cs" />
     <Compile Include="Model.VocalObject\TrackerObject.cs" />

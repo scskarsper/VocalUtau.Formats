@@ -85,10 +85,11 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
 
-        SortedDictionary<long, NoteObject> _NoteList = new SortedDictionary<long, NoteObject>();
+        List<NoteObject> _NoteList = new List<NoteObject>();
+        List<PitchObject> _PitchList = new List<PitchObject>();
 
         [DataMember]
-        public SortedDictionary<long, NoteObject> NoteList
+        public List<NoteObject> NoteList
         {
             get { return _NoteList; }
             set { _NoteList = value; }
@@ -103,18 +104,11 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _FullCurves = value; }
         }
 
-        ControlPointObject<double> _PitchBends = new ControlPointObject<double>();
-
         [DataMember]
-        public ControlPointObject<double> PitchBends
+        public List<PitchObject> PitchBendsList
         {
-            get { return _PitchBends; }
-            set { _PitchBends = value; }
-        }
-
-        public double getPitchBends(long Tick, double defaultValue)
-        {
-            return PitchBends.GetValue(Tick, defaultValue);
+            get { return _PitchList; }
+            set { _PitchList = value; }
         }
     }
 }
