@@ -9,9 +9,9 @@ namespace VocalUtau.Formats.Model.VocalObject
     [DataContract]
     public class TrackerObject
     {
-        SortedDictionary<double, PartsObject> _partList = new SortedDictionary<double, PartsObject>();
+        List<PartsObject> _partList = new List<PartsObject>();
         [DataMember]
-        public SortedDictionary<double, PartsObject> PartList
+        public List<PartsObject> PartList
         {
             get { return _partList; }
             set { _partList = value; }
