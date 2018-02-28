@@ -105,6 +105,18 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _PhonemeAtoms = value; }
         }
 
+        public void InitNote()
+        {
+            try
+            {
+                _PhonemeAtoms.Clear();
+                _PhonemeAtoms.Add(new NoteAtomObject());
+                _PhonemeAtoms[0].InitNoteAtom();
+            }
+            catch { ;}
+            Lyric = "a";
+        }
+
         public object Clone()
         {
             BinaryFormatter Formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone));

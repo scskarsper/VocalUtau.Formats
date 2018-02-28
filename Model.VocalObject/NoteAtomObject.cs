@@ -18,6 +18,10 @@ namespace VocalUtau.Formats.Model.VocalObject
             _PhonemeAtom = Phoneme;
         }
 
+        public void InitNoteAtom()
+        {
+        }
+
         double _AtomLength = 0;
 
         public double AtomLength

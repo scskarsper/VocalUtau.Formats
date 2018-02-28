@@ -16,7 +16,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 
         public void Add(long Tick, T data)
         {
-            long sTick = MathUtils.GetNormalizeTick(Tick);
+            long sTick = MidiMathUtils.GetNormalizeTick(Tick);
             if (sortDic.ContainsKey(sTick))
             {
                 sortDic[sTick] = data;
@@ -28,7 +28,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
         public void Del(long Tick)
         {
-            long sTick = MathUtils.GetNormalizeTick(Tick);
+            long sTick = MidiMathUtils.GetNormalizeTick(Tick);
             if (sortDic.ContainsKey(sTick))
             {
                 sortDic.Remove(sTick);
@@ -36,7 +36,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
         public T GetValue(long Tick,T defaultValue=default(T))
         {
-            long sTick = MathUtils.GetNormalizeTick(Tick);
+            long sTick = MidiMathUtils.GetNormalizeTick(Tick);
             if (sortDic.ContainsKey(sTick))
             {
                 return sortDic[Tick];

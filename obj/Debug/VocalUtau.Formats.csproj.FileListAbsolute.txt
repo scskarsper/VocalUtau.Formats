@@ -2,3 +2,4 @@ D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\VocalUtau.Formats.dll
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\VocalUtau.Formats.pdb
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.dll
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.csprojResolveAssemblyReference.cache

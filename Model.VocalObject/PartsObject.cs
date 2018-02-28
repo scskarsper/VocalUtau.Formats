@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
+    [Serializable]
     [DataContract]
-    public class PartsObject
+    public class PartsObject : IComparable, IComparer<NoteObject>, ICloneable
     {
         public PartsObject()
         {
@@ -76,12 +79,28 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _TickLength; }
             set { _TickLength = value; }
         }
+
+        double _StartTime = 0;
+
+        [DataMember]
+        public double StartTime
+        {
+            get { return _StartTime; }
+            set { _StartTime = value; }
+        }
+
+        [IgnoreDataMember]
+        public long AbsoluteStartTick
+        {
+            get { return Utils.MidiMathUtils.Time2Tick(_StartTime, _Tempo); }
+            set { _StartTime = Utils.MidiMathUtils.Tick2Time(value, _Tempo); }
+        }
         
         [IgnoreDataMember]
         public double DuringTime
         {
-            get { return Utils.MathUtils.Tick2Time(_TickLength, _Tempo); }
-            set { _TickLength = Utils.MathUtils.Time2Tick(value, _Tempo); }
+            get { return Utils.MidiMathUtils.Tick2Time(_TickLength, _Tempo); }
+            set { _TickLength = Utils.MidiMathUtils.Time2Tick(value, _Tempo); }
         }
 
 
@@ -109,6 +128,35 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { return _PitchList; }
             set { _PitchList = value; }
+        }
+
+        public object Clone()
+        {
+            BinaryFormatter Formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone));
+            MemoryStream stream = new MemoryStream();
+            Formatter.Serialize(stream, this);
+            stream.Position = 0;
+            object clonedObj = Formatter.Deserialize(stream);
+            stream.Close();
+            return clonedObj;
+        }
+        public int CompareTo(Object o)
+        {
+            if (this.StartTime > ((PartsObject)o).StartTime)
+                return 1;
+            else if (this.StartTime == ((PartsObject)o).StartTime)
+                return 0;
+            else
+                return -1;
+        }
+        public int Compare(PartsObject x, PartsObject y)
+        {
+            if (x.StartTime < y.StartTime)
+                return -1;
+            else if (x.StartTime == y.StartTime)
+                return 0;
+            else
+                return 1;
         }
     }
 }

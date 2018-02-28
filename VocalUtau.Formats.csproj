@@ -43,7 +43,8 @@
     <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalProject.cs" />
-    <Compile Include="Model.Utils\MathUtils.cs" />
+    <Compile Include="Model.Utils\MidiMathUtils.cs" />
+    <Compile Include="Model.Utils\ObjectAlloc.cs" />
     <Compile Include="Model.VocalObject\BackerObject.cs" />
     <Compile Include="Model.VocalObject\ControlPointObject.cs" />
     <Compile Include="Model.VocalObject\NoteAtomObject.cs" />
