@@ -54,6 +54,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.BackerList.Add(1, new BackerObject());
             this.TrackerList.Clear();
             this.TrackerList.Add(1, new TrackerObject());
+            this.TrackerList[1].PartList.Add(new PartsObject());
             this.SingerList.Clear();
             this.SingerList.Add(1, new SingerObject());
         }

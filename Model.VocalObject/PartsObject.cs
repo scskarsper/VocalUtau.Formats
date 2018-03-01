@@ -10,7 +10,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class PartsObject : IComparable, IComparer<NoteObject>, ICloneable
+    public class PartsObject : IComparable, IComparer<PartsObject>, ICloneable
     {
         public PartsObject()
         {
@@ -128,6 +128,62 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { return _PitchList; }
             set { _PitchList = value; }
+        }
+
+        public void OrderList()
+        {
+            long HeadPtr = long.MinValue;
+            _NoteList.Sort();
+            for (int i = 0; i < _NoteList.Count; i++)
+            {
+                if (HeadPtr > _NoteList[i].Tick)
+                {
+                    long NoteEnd = _NoteList[i].Tick + _NoteList[i].Length;
+                    if (NoteEnd > HeadPtr)
+                    {
+                        //后面有多余出来的
+                        _NoteList[i].Length = NoteEnd - HeadPtr;
+                        _NoteList[i].Tick = HeadPtr;
+                        if (_NoteList[i].Length < 32)
+                        {
+                            //小于32tick，无效音符
+                            _NoteList.RemoveAt(i);
+                            i--;
+                        }
+                        else
+                        {
+                            //切断尾长
+                            HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
+                        }
+                    }
+                    else
+                    {
+                        _NoteList.RemoveAt(i);
+                        i--;
+                    }
+                }
+                else
+                {
+                    HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
+                }
+            }
+        }
+        public bool CheckOrdered()
+        {
+            bool ret = true;
+            long HeadPtr = long.MinValue;
+            _PitchList.Sort();
+            _NoteList.Sort();
+            for (int i = 0; i < _NoteList.Count; i++)
+            {
+                if (HeadPtr > _NoteList[i].Tick)
+                {
+                    ret = false;
+                    break;
+                }
+                HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
+            }
+            return ret;
         }
 
         public object Clone()
