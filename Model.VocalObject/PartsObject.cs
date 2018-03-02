@@ -114,13 +114,30 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _NoteList = value; }
         }
 
-        SortedDictionary<string, ControlPointObject<double>> _FullCurves = new SortedDictionary<string, ControlPointObject<double>>();
+        SortedDictionary<string, List<ControlObject>> _FullCurves = new SortedDictionary<string, List<ControlObject>>();
 
         [DataMember]
-        public SortedDictionary<string, ControlPointObject<double>> FullCurves
+        public SortedDictionary<string, List<ControlObject>> FullCurves
         {
             get { return _FullCurves; }
             set { _FullCurves = value; }
+        }
+
+        private int _DynBaseValue = 100;
+
+        [DataMember]
+        public int DynBaseValue
+        {
+            get { return _DynBaseValue; }
+            set { _DynBaseValue = value; }
+        }
+
+        private List<ControlObject> _DynList = new List<ControlObject>();
+        [DataMember]
+        public List<ControlObject> DynList
+        {
+            get { return _DynList; }
+            set { _DynList = value; }
         }
 
         [DataMember]

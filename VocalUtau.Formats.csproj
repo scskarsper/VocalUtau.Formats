@@ -46,7 +46,6 @@
     <Compile Include="Model.Utils\MidiMathUtils.cs" />
     <Compile Include="Model.Utils\ObjectAlloc.cs" />
     <Compile Include="Model.VocalObject\BackerObject.cs" />
-    <Compile Include="Model.VocalObject\ControlPointObject.cs" />
     <Compile Include="Model.VocalObject\NoteAtomObject.cs" />
     <Compile Include="Model.VocalObject\NoteObject.cs" />
     <Compile Include="Model.VocalObject\ObjectSerializer.cs" />
@@ -57,6 +56,7 @@
     <Compile Include="Model.VocalObject\SingerObject.cs" />
     <Compile Include="Model.VocalObject\TrackerObject.cs" />
     <Compile Include="Model.VocalObject\WaveObject.cs" />
+    <Compile Include="Model.VocalObject\ControlObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

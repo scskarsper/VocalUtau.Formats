@@ -105,6 +105,16 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _PhonemeAtoms = value; }
         }
 
+        private double _VerbPrecent = 0.3;
+
+        [DataMember]
+        public double VerbPrecent
+        {
+            get { return _VerbPrecent; }
+            set { if (value > 1)_VerbPrecent = 1; else if (value < 0)_VerbPrecent = 0; else  _VerbPrecent = value; }
+        }
+
+
         public void InitNote()
         {
             try
