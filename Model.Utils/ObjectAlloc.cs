@@ -33,6 +33,13 @@ namespace VocalUtau.Formats.Model.Utils
             Free();
             handle = GCHandle.Alloc(Obj);
         }
+        public object AllocedObject
+        {
+            get
+            {
+                return handle.Target;
+            }
+        }
         public IntPtr IntPtr
         {
             get
