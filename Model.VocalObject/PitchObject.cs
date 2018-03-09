@@ -30,7 +30,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.Tick = Tick;
         }
         PitchAtomObject pvp = new PitchAtomObject(60);
-        [DataMember]
+        [IgnoreDataMember]
         public PitchAtomObject PitchValue
         {
             get
@@ -40,6 +40,18 @@ namespace VocalUtau.Formats.Model.VocalObject
             set
             {
                 pvp = value;
+            }
+        }
+        [DataMember]
+        public double Pitch
+        {
+            get
+            {
+                return pvp.PitchValue;
+            }
+            set
+            {
+                pvp = new PitchAtomObject(value);
             }
         }
 

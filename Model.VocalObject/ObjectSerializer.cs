@@ -10,7 +10,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     public class ObjectSerializer<T>
     {
-        internal ObjectSerializer()
+        public ObjectSerializer()
         {
         }
         public string Serialize(T Object)
@@ -37,7 +37,7 @@ namespace VocalUtau.Formats.Model.VocalObject
     }
     public class ObjectDeserializer<T>
     {
-        internal ObjectDeserializer()
+        public ObjectDeserializer()
         {
         }
         public T Deserialize(string Json)
@@ -92,7 +92,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return SerializeableObject<T>._Deserializer; }
         }
 
-        internal SerializeableObject()
+        public SerializeableObject()
         {
             _Serializer = new ObjectSerializer<T>();
             _Deserializer = new ObjectDeserializer<T>();

@@ -89,11 +89,15 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _StartTime = value; }
         }
 
-        [IgnoreDataMember]
-        public long AbsoluteStartTick
+        public long getAbsoluteStartTick(double Tempo=-1)
         {
-            get { return Utils.MidiMathUtils.Time2Tick(_StartTime, _Tempo); }
-            set { _StartTime = Utils.MidiMathUtils.Tick2Time(value, _Tempo); }
+            if (Tempo < 0) Tempo = _Tempo;
+            return Utils.MidiMathUtils.Time2Tick(_StartTime, Tempo);
+        }
+        public void setAbsoluteStartTick(long value,double Tempo = -1)
+        {
+            if (Tempo < 0) Tempo = _Tempo;
+            _StartTime = Utils.MidiMathUtils.Tick2Time(value, Tempo);
         }
         
         [IgnoreDataMember]

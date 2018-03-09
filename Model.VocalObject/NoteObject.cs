@@ -72,7 +72,12 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _lyc; }
             set
             {
-                _lyc = value; if (_PhonemeAtoms.Count == 1)
+                _lyc = value;
+                if (_PhonemeAtoms == null)
+                {
+                    _PhonemeAtoms = new List<NoteAtomObject>() { new NoteAtomObject() };
+                }
+                if (_PhonemeAtoms.Count == 1)
                 {
                     if (_PhonemeAtoms[0].PhonemeAtom == "")
                     {
@@ -82,8 +87,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
         PitchAtomObject pvp = new PitchAtomObject(60);
-
-        [DataMember]
+        [IgnoreDataMember]
         public PitchAtomObject PitchValue
         {
             get
@@ -96,12 +100,32 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
 
+        [DataMember]
+        public double Pitch
+        {
+            get
+            {
+                return pvp.PitchValue;
+            }
+            set
+            {
+                pvp = new PitchAtomObject(value);
+            }
+        }
+
         List<NoteAtomObject> _PhonemeAtoms = new List<NoteAtomObject>() { new NoteAtomObject() };
 
         [DataMember]
         public List<NoteAtomObject> PhonemeAtoms
         {
-            get { return _PhonemeAtoms; }
+            get
+            {
+                if (_PhonemeAtoms == null)
+                {
+                    _PhonemeAtoms = new List<NoteAtomObject>() { new NoteAtomObject() };
+                } 
+                return _PhonemeAtoms;
+            }
             set { _PhonemeAtoms = value; }
         }
 

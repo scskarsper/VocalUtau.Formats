@@ -9,6 +9,10 @@ namespace VocalUtau.Formats.Model.VocalObject
     [DataContract]
     public class TrackerObject
     {
+        public TrackerObject(uint index)
+        {
+            this.Index = index;
+        }
         List<PartsObject> _partList = new List<PartsObject>();
         [DataMember]
         public List<PartsObject> PartList
@@ -16,6 +20,17 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _partList; }
             set { _partList = value; }
         }
+
+        [IgnoreDataMember]
+        public double TotalLength
+        {
+            get
+            {
+                if (_partList.Count == 0) return 0;
+                return _partList[_partList.Count - 1].StartTime+_partList[_partList.Count - 1].DuringTime; ;
+            }
+        }
+
         public void OrderList()
         {
             double HeadPtr = double.MinValue;
@@ -44,6 +59,50 @@ namespace VocalUtau.Formats.Model.VocalObject
                 HeadPtr = _partList[i].StartTime + _partList[i].DuringTime;
             }
             return ret;
+        }
+
+        string _name = "";
+        [DataMember]
+        public string Name
+        {
+            get
+            {
+                if (_name == "")
+                {
+                    return "Vocal Track "+Index.ToString();
+                }
+                else
+                {
+                    return _name;
+                }
+            }
+            set { _name = value; }
+        }
+
+        private uint _index;
+        [DataMember]
+        public uint Index
+        {
+            get { return _index; }
+            set { _index = value; }
+        }
+        public int CompareTo(Object o)
+        {
+            if (this.Index > ((TrackerObject)o).Index)
+                return 1;
+            else if (this.Index == ((TrackerObject)o).Index)
+                return 0;
+            else
+                return -1;
+        }
+        public int Compare(TrackerObject x, TrackerObject y)
+        {
+            if (x.Index < y.Index)
+                return -1;
+            else if (x.Index == y.Index)
+                return 0;
+            else
+                return 1;
         }
     }
 }
