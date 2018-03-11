@@ -7,15 +7,15 @@ using System.Text;
 namespace VocalUtau.Formats.Model.VocalObject
 {
     [DataContract]
-    public class BackerObject
+    public class BackerObject : ITrackerInterface
     {
         public BackerObject(uint index)
         {
             this.Index = index;
         }
-        SortedDictionary<double, WaveObject> _wavPartList = new SortedDictionary<double, WaveObject>();
+        List<WavePartsObject> _wavPartList = new List<WavePartsObject>();
         [DataMember]
-        public SortedDictionary<double, WaveObject> WavPartList
+        public List<WavePartsObject> WavPartList
         {
             get { return _wavPartList; }
             set { _wavPartList = value; }
@@ -37,6 +37,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
             set { _name = value; }
         }
+
         private uint _index;
         [DataMember]
         public uint Index
@@ -44,6 +45,26 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _index; }
             set { _index = value; }
         }
+
+
+        public uint getIndex()
+        {
+            return _index;
+        }
+        public void setIndex(uint Index)
+        {
+            _index = Index;
+        }
+        public string getName()
+        {
+            return Name;
+        }
+        public void setName(string Name)
+        {
+            this.Name = Name;
+        }
+
+
         public int CompareTo(Object o)
         {
             if (this.Index > ((BackerObject)o).Index)
@@ -61,6 +82,47 @@ namespace VocalUtau.Formats.Model.VocalObject
                 return 0;
             else
                 return 1;
+        }
+
+
+        [IgnoreDataMember]
+        public double TotalLength
+        {
+            get
+            {
+                if (_wavPartList.Count == 0) return 0;
+                return _wavPartList[_wavPartList.Count - 1].StartTime + _wavPartList[_wavPartList.Count - 1].DuringTime;
+            }
+        }
+
+        public void OrderList()
+        {
+            double HeadPtr = double.MinValue;
+            _wavPartList.Sort();
+            for (int i = 0; i < _wavPartList.Count; i++)
+            {
+                if (HeadPtr > _wavPartList[i].StartTime)
+                {
+                    _wavPartList[i].StartTime = HeadPtr;
+                }
+                HeadPtr = _wavPartList[i].StartTime + _wavPartList[i].DuringTime;
+            }
+        }
+        public bool CheckOrdered()
+        {
+            bool ret = true;
+            double HeadPtr = double.MinValue;
+            _wavPartList.Sort();
+            for (int i = 0; i < _wavPartList.Count; i++)
+            {
+                if (HeadPtr > _wavPartList[i].StartTime)
+                {
+                    ret = false;
+                    break;
+                }
+                HeadPtr = _wavPartList[i].StartTime + _wavPartList[i].DuringTime;
+            }
+            return ret;
         }
     }
 }

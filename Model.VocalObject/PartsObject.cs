@@ -10,14 +10,29 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class PartsObject : IComparable, IComparer<PartsObject>, ICloneable
+    public class PartsObject : IComparable, IComparer<PartsObject>, ICloneable,IPartsInterface
     {
+        string _GUID = "";
+
+        public string GUID
+        {
+            get { return _GUID; }
+            set { _GUID = value; }
+        }
+        public string getGuid()
+        {
+            return GUID;
+        }
+
+
         public PartsObject()
         {
+            _GUID = Guid.NewGuid().ToString();
         }
         public PartsObject(string PartName)
         {
             _PartName = PartName;
+            _GUID = Guid.NewGuid().ToString();
         }
 
         string _PartName = "";
@@ -99,6 +114,11 @@ namespace VocalUtau.Formats.Model.VocalObject
             if (Tempo < 0) Tempo = _Tempo;
             _StartTime = Utils.MidiMathUtils.Tick2Time(value, Tempo);
         }
+        public long getAbsoluteEndTick(double Tempo = -1)
+        {
+            if (Tempo < 0) Tempo = _Tempo;
+            return Utils.MidiMathUtils.Time2Tick(_StartTime+DuringTime, Tempo);
+        }
         
         [IgnoreDataMember]
         public double DuringTime
@@ -107,6 +127,30 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _TickLength = Utils.MidiMathUtils.Time2Tick(value, _Tempo); }
         }
 
+        public double getDuringTime()
+        {
+            return DuringTime;
+        }
+        public void setDuringTime(double DuringTime)
+        {
+            this.DuringTime = DuringTime;
+        }
+        public string getPartName()
+        {
+            return PartName;
+        }
+        public void setPartName(string Name)
+        {
+            this.PartName = Name;
+        }
+        public double getStartTime()
+        {
+            return StartTime;
+        }
+        public void setStartTime(double StartTime)
+        {
+            this.StartTime = StartTime;
+        }
 
         List<NoteObject> _NoteList = new List<NoteObject>();
         List<PitchObject> _PitchList = new List<PitchObject>();

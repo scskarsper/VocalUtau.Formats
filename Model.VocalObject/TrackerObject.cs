@@ -7,7 +7,7 @@ using System.Text;
 namespace VocalUtau.Formats.Model.VocalObject
 {
     [DataContract]
-    public class TrackerObject
+    public class TrackerObject : ITrackerInterface
     {
         public TrackerObject(uint index)
         {
@@ -86,6 +86,26 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _index; }
             set { _index = value; }
         }
+
+
+        public uint getIndex()
+        {
+            return _index;
+        }
+        public void setIndex(uint Index)
+        {
+            _index = Index;
+        }
+        public string getName()
+        {
+            return Name;
+        }
+        public void setName(string Name)
+        {
+            this.Name = Name;
+        }
+
+
         public int CompareTo(Object o)
         {
             if (this.Index > ((TrackerObject)o).Index)
