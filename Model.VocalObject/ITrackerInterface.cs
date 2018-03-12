@@ -9,7 +9,8 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         void OrderList();
         bool CheckOrdered();
-
+        double getVolume();
+        void setVolume(double volume);
         string getName();
 
         uint getIndex();

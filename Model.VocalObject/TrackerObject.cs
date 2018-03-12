@@ -1,14 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
     [DataContract]
-    public class TrackerObject : ITrackerInterface
+    public class TrackerObject : IComparable, ICloneable, ITrackerInterface, IComparer<TrackerObject>
     {
+        string _GUID = "";
+
+        public string GUID
+        {
+            get { return _GUID; }
+            set { _GUID = value; }
+        }
+        public string getGuid()
+        {
+            return GUID;
+        }
+
         public TrackerObject(uint index)
         {
             this.Index = index;
@@ -69,7 +83,8 @@ namespace VocalUtau.Formats.Model.VocalObject
             {
                 if (_name == "")
                 {
-                    return "Vocal Track "+Index.ToString();
+                    _name = "Vocal Track " + Index.ToString();
+                    return _name;
                 }
                 else
                 {
@@ -105,7 +120,32 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.Name = Name;
         }
 
+        private double _volume = 0.8;
+        [DataMember]
+        public double Volume
+        {
+            get { return _volume; }
+            set { _volume = value; if (_volume < 0)_volume = 0; if (_volume > 2)_volume = 2; }
+        }
+        public double getVolume()
+        {
+            return this.Volume;
+        }
+        public void setVolume(double volume)
+        {
+            this.Volume = volume;
+        }
 
+        public object Clone()
+        {
+            BinaryFormatter Formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone));
+            MemoryStream stream = new MemoryStream();
+            Formatter.Serialize(stream, this);
+            stream.Position = 0;
+            object clonedObj = Formatter.Deserialize(stream);
+            stream.Close();
+            return clonedObj;
+        }
         public int CompareTo(Object o)
         {
             if (this.Index > ((TrackerObject)o).Index)
