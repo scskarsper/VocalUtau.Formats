@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model.Database\VocalDatabase\SoundAtom.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalProject.cs" />
     <Compile Include="Model.Utils\MidiMathUtils.cs" />
     <Compile Include="Model.Utils\ObjectAlloc.cs" />
+    <Compile Include="Model.Utils\PitchEncoderUtils.cs" />
     <Compile Include="Model.VocalObject\BackerObject.cs" />
     <Compile Include="Model.VocalObject\IPartsInterface.cs" />
     <Compile Include="Model.VocalObject\ITrackerInterface.cs" />
