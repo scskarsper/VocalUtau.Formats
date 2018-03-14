@@ -47,6 +47,8 @@
     <Compile Include="Model.Utils\MidiMathUtils.cs" />
     <Compile Include="Model.Utils\ObjectAlloc.cs" />
     <Compile Include="Model.Utils\PitchEncoderUtils.cs" />
+    <Compile Include="Model.Utils\UtauRendCommanderUtils.cs" />
+    <Compile Include="Model.Utils\UtauToolUtils.cs" />
     <Compile Include="Model.VocalObject\BackerObject.cs" />
     <Compile Include="Model.VocalObject\IPartsInterface.cs" />
     <Compile Include="Model.VocalObject\ITrackerInterface.cs" />
