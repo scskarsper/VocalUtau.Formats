@@ -163,6 +163,10 @@ namespace VocalUtau.Formats.Model.USTs.Original
                     po.NoteList.Add(no);
                     TotalTick += ust.Notes[i].Length;// -ust.Notes[i].Overlap;
                 }
+                else
+                {
+                    TotalTick += len;
+                }
             }
             po.TickLength = TotalTick;
             return po;
