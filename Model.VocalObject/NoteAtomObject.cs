@@ -30,6 +30,14 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _AtomLength = value; }
         }
 
+        bool _FixedLength = false;
+
+        public bool FixedLength
+        {
+            get { return _FixedLength; }
+            set { _FixedLength = value; }
+        }
+
         string _PhonemeAtom = "";
 
         [DataMember]
