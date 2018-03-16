@@ -22,20 +22,20 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
         }
 
-        double _AtomLength = 0;
+        long _AtomLength = 0;
 
-        public double AtomLength
+        public long AtomLength
         {
             get { return _AtomLength; }
             set { _AtomLength = value; }
         }
 
-        bool _FixedLength = false;
+        bool _LengthIsPercent = false;
 
-        public bool FixedLength
+        public bool LengthIsPercent
         {
-            get { return _FixedLength; }
-            set { _FixedLength = value; }
+            get { return _LengthIsPercent; }
+            set { _LengthIsPercent = value; }
         }
 
         string _PhonemeAtom = "";
