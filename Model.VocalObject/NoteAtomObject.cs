@@ -119,13 +119,40 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _Velocity = value; }
         }
 
-        List<KeyValuePair<double, double>> _Envelopes = new List<KeyValuePair<double, double>>();
+        //List<KeyValuePair<double, double>> _Envelopes = new List<KeyValuePair<double, double>>();
+
+        //public List<KeyValuePair<double, double>> Envelopes
+        //{
+        //    get { return _Envelopes; }
+        //    set { _Envelopes = value; }
+        //}
+
+
+        long _fadeInLengthMs = 5;
 
         [DataMember]
-        public List<KeyValuePair<double, double>> Envelopes
+        public long FadeInLengthMs
         {
-            get { return _Envelopes; }
-            set { _Envelopes = value; }
+            get { return _fadeInLengthMs; }
+            set { _fadeInLengthMs = value; }
+        }
+
+        long _fadeOutLengthMs = 35;
+
+        [DataMember]
+        public long FadeOutLengthMs
+        {
+            get { return _fadeOutLengthMs; }
+            set { _fadeOutLengthMs = value; }
+        }
+
+        long _volumePercentInt = 100;
+
+        [DataMember]
+        public long VolumePercentInt
+        {
+            get { return _volumePercentInt; }
+            set { _volumePercentInt = value; }
         }
     }
 }

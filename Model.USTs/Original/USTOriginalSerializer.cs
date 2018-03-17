@@ -159,7 +159,14 @@ namespace VocalUtau.Formats.Model.USTs.Original
                     no.PhonemeAtoms[0].PreUtterance = ust.Notes[i].PreUtterance;
                     no.PhonemeAtoms[0].StartPoint = ust.Notes[i].StartPoint;
                     no.PhonemeAtoms[0].Velocity = ust.Notes[i].Velocity;
-                    no.PhonemeAtoms[0].Envelopes.AddRange(ust.Notes[i].EnvelopAnalyse());
+                    List<KeyValuePair<double,double>> env=ust.Notes[i].EnvelopAnalyse();
+                    try
+                    {
+                        no.PhonemeAtoms[0].FadeInLengthMs = (long)(env[2].Key);//P2
+                        no.PhonemeAtoms[0].FadeOutLengthMs = (long)(env[3].Key);//P3
+                        no.PhonemeAtoms[0].VolumePercentInt = (long)((env[2].Value + env[3].Value) / 2);//V2+V3/2
+                    }
+                    catch { ;}
                     po.NoteList.Add(no);
                     TotalTick += ust.Notes[i].Length;// -ust.Notes[i].Overlap;
                 }

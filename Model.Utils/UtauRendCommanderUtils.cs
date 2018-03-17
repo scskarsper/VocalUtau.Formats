@@ -234,6 +234,14 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _fadeOutLengthMs = value; }
             }
 
+            long _volumePercentInt = 100;
+
+            public long VolumePercentInt
+            {
+                get { return _volumePercentInt; }
+                set { _volumePercentInt = value; }
+            }
+
             SortedDictionary<long, long> _EnvlopePoints = new SortedDictionary<long, long>();
 
             public SortedDictionary<long, long> EnvlopePoints
@@ -273,19 +281,20 @@ namespace VocalUtau.Formats.Model.Utils
             TargetEnvlope.Add(0, 0);
             TargetEnvlope.Add(TotalLength,0);
             long LastVol=100;
+            double vpcp = (double)Args.VolumePercentInt / 100.0;
             foreach (KeyValuePair<long, long> sortEnv in Args.EnvlopePoints)
             {
                 if (sortEnv.Key == EnvStart)
                 {
-                    TargetEnvlope.Add(sortEnv.Key, sortEnv.Value);
+                    TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
                 }
                 else if (sortEnv.Key > EnvStart && sortEnv.Key <= EnvEnd)
                 {
                     if (!TargetEnvlope.ContainsKey(EnvStart))
                     {
-                        TargetEnvlope.Add(EnvStart, LastVol);
+                        TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
                     }
-                    TargetEnvlope.Add(sortEnv.Key, sortEnv.Value);
+                    TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
                 }
                 else if (sortEnv.Key > EnvEnd)
                 {
@@ -297,7 +306,7 @@ namespace VocalUtau.Formats.Model.Utils
             {
                 if (Args.EnvlopePoints.Count == 0 || TargetEnvlope.Count==0)
                 {
-                    TargetEnvlope.Add(EnvStart, LastVol);
+                    TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
                 }
                 else
                 {
@@ -306,7 +315,7 @@ namespace VocalUtau.Formats.Model.Utils
             }
             if (!TargetEnvlope.ContainsKey(EnvEnd))
             {
-                TargetEnvlope.Add(EnvEnd, LastVol);
+                TargetEnvlope.Add(EnvEnd, (long)(LastVol * vpcp));
             }
             List<string> wavtool_arg_suffix = new List<string>{
                         "\"" + Args.InputWavfile+"\"",
@@ -333,7 +342,7 @@ namespace VocalUtau.Formats.Model.Utils
                 long dert = sortEnv.Key - lastMs;
                 lastMs = sortEnv.Key;
                 wavtool_arg_suffix.Add(dert.ToString());
-                wavtool_arg_suffix.Add(sortEnv.Value.ToString());
+                wavtool_arg_suffix.Add(((long)(sortEnv.Value * vpcp)).ToString());
             }
             return String.Join(" ", wavtool_arg_suffix);
         }
