@@ -14,6 +14,7 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         string _GUID = "";
 
+        [DataMember]
         public string GUID
         {
             get { return _GUID; }

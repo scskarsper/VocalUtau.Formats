@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model.Database\VocalDatabase\CharacterAtom.cs" />
     <Compile Include="Model.Database\VocalDatabase\SoundAtom.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />

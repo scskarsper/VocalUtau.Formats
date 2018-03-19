@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -14,6 +15,7 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         string _GUID = "";
 
+        [DataMember]
         public string GUID
         {
             get { return _GUID; }
@@ -33,6 +35,15 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             _PartName = PartName;
             _GUID = Guid.NewGuid().ToString();
+        }
+
+        string _SingerGUID = "";
+
+        [DataMember]
+        public string SingerGUID
+        {
+            get { return _SingerGUID; }
+            set { _SingerGUID = value; }
         }
 
         string _PartName = "";
@@ -77,22 +88,45 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
 
+        double _BaseTempo = 120.0;
+
+        [DataMember]
+        public double BaseTempo
+        {
+            get { return _BaseTempo; }
+            set { _BaseTempo = value; }
+        }
+
         double _Tempo = 120.0;
+
+        public double getRealTempo()
+        {
+            return _Tempo;
+        }
 
         [DataMember]
         public double Tempo
         {
-            get { return _Tempo; }
+            get { return double.IsNaN(_Tempo) ? _BaseTempo : _Tempo; }
             set { _Tempo = value; }
         }
 
-        long _TickLength = 0;
+        //long _TickLength = 0;
 
-        [DataMember]
+      //  [DataMember]
         public long TickLength
         {
-            get { return _TickLength; }
-            set { _TickLength = value; }
+            get { if (NoteList.Count == 0)return 480;
+                
+            //    return NoteList[NoteList.Count-1].Tick+NoteList[NoteList.Count-1].Length; 
+            
+                long max = 0;
+                for (int i = 0; i < NoteList.Count; i++)
+                {
+                    max = Math.Max(max, NoteList[i].Tick + NoteList[i].Length);
+                }
+                return max;
+            }
         }
 
         double _StartTime = 0;
@@ -106,35 +140,35 @@ namespace VocalUtau.Formats.Model.VocalObject
 
         public long getAbsoluteStartTick(double Tempo=-1)
         {
-            if (Tempo < 0) Tempo = _Tempo;
+            if (Tempo < 0) Tempo = this.Tempo;
             return Utils.MidiMathUtils.Time2Tick(_StartTime, Tempo);
         }
         public void setAbsoluteStartTick(long value,double Tempo = -1)
         {
-            if (Tempo < 0) Tempo = _Tempo;
+            if (Tempo < 0) Tempo = this.Tempo;
             _StartTime = Utils.MidiMathUtils.Tick2Time(value, Tempo);
         }
         public long getAbsoluteEndTick(double Tempo = -1)
         {
-            if (Tempo < 0) Tempo = _Tempo;
+            if (Tempo < 0) Tempo = this.Tempo;
             return Utils.MidiMathUtils.Time2Tick(_StartTime+DuringTime, Tempo);
         }
         
         [IgnoreDataMember]
         public double DuringTime
         {
-            get { return Utils.MidiMathUtils.Tick2Time(_TickLength, _Tempo); }
-            set { _TickLength = Utils.MidiMathUtils.Time2Tick(value, _Tempo); }
+            get { return Utils.MidiMathUtils.Tick2Time(TickLength, Tempo); }
+          //  set { _TickLength = Utils.MidiMathUtils.Time2Tick(value, Tempo); }
         }
 
         public double getDuringTime()
         {
             return DuringTime;
         }
-        public void setDuringTime(double DuringTime)
+       /* public void setDuringTime(double DuringTime)
         {
             this.DuringTime = DuringTime;
-        }
+        }*/
         public string getPartName()
         {
             return PartName;

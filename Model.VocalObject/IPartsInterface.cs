@@ -8,7 +8,7 @@ namespace VocalUtau.Formats.Model.VocalObject
     public interface IPartsInterface
     {
         double getDuringTime();
-        void setDuringTime(double DuringTime);
+      //  void setDuringTime(double DuringTime);
         string getPartName();
         void setPartName(string Name);
         double getStartTime();

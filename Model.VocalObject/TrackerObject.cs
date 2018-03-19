@@ -13,6 +13,7 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         string _GUID = "";
 
+        [DataMember]
         public string GUID
         {
             get { return _GUID; }
@@ -41,7 +42,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get
             {
                 if (_partList.Count == 0) return 0;
-                return _partList[_partList.Count - 1].StartTime+_partList[_partList.Count - 1].DuringTime; ;
+                return _partList[_partList.Count - 1].StartTime+_partList[_partList.Count - 1].DuringTime;
             }
         }
 

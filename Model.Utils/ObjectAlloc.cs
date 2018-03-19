@@ -8,12 +8,21 @@ namespace VocalUtau.Formats.Model.Utils
 {
     public class ObjectAlloc<T>
     {
+        public static Dictionary<T, long> UsingCount = new Dictionary<T, long>();
         GCHandle handle;
         public ObjectAlloc()
         {
         }
         public ObjectAlloc(T Obj)
         {
+            if (UsingCount.ContainsKey(Obj))
+            {
+                UsingCount[Obj]++;
+            }
+            else
+            {
+                UsingCount.Add(Obj, 1);
+            }
             handle = GCHandle.Alloc(Obj);
         }
         ~ObjectAlloc()
@@ -22,22 +31,57 @@ namespace VocalUtau.Formats.Model.Utils
         }
         public void Free()
         {
+            bool canRelease = true;
             try
             {
-                handle.Free();
+                if (handle.Target.GetType() != typeof(T))
+                {
+                    canRelease = true;
+                }
+                else
+                {
+                    if (UsingCount.ContainsKey((T)handle.Target))
+                    {
+                        if (UsingCount[(T)handle.Target] > 1)
+                        {
+                            canRelease = false;
+                            UsingCount[(T)handle.Target]--;
+                        }
+                    }
+                    else
+                    {
+                        canRelease = true;
+                    }
+                }
+                if (canRelease)
+                {
+                    handle.Free();
+                }
             }
             catch { ;}
         }
         public void ReAlloc(T Obj)
         {
             Free();
+            if (UsingCount.ContainsKey(Obj))
+            {
+                UsingCount[Obj]++;
+            }
+            else
+            {
+                UsingCount.Add(Obj, 1);
+            }
             handle = GCHandle.Alloc(Obj);
         }
         public object AllocedObject
         {
             get
             {
-                return handle.Target;
+                try
+                {
+                    return handle.Target;
+                }
+                catch { return null; }
             }
         }
         public IntPtr IntPtr

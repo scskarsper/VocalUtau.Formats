@@ -175,7 +175,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
                     TotalTick += len;
                 }
             }
-            po.TickLength = TotalTick;
+            //po.TickLength = TotalTick;
             return po;
         }
     }

@@ -20,10 +20,10 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _projectName = value; }
         }
 
-        SortedDictionary<int, SingerObject> _singerList = new SortedDictionary<int, SingerObject>();
+        List<SingerObject> _singerList = new List<SingerObject>();
         //Singers
         [DataMember]
-        public SortedDictionary<int, SingerObject> SingerList
+        public List<SingerObject> SingerList
         {
             get { return _singerList; }
             set { _singerList = value; }
@@ -38,6 +38,14 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { baseTempo = value;
             if (baseTempo < 30) baseTempo = 30;
             if (baseTempo > 300) baseTempo = 500;
+            for (int i = 0; i < TrackerList.Count; i++)
+            {
+                for (int j = 0; j < TrackerList[i].PartList.Count; j++)
+                {
+
+                    TrackerList[i].PartList[j].BaseTempo = baseTempo;
+                }
+            }
             }
         }
 
@@ -83,7 +91,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.TrackerList.Add(new TrackerObject(0));
             this.TrackerList[0].PartList.Add(new PartsObject());
             this.SingerList.Clear();
-            this.SingerList.Add(1, new SingerObject());
+            this.SingerList.Add(new SingerObject());
         }
 
         public double Tick2Time(long Tick)
