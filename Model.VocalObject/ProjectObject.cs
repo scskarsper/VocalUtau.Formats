@@ -20,6 +20,14 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _projectName = value; }
         }
 
+        string _projectFilePath = "";
+        [IgnoreDataMember]
+        public string ProjectFilePath
+        {
+            get { return _projectFilePath; }
+            set { _projectFilePath = value; }
+        }
+
         List<SingerObject> _singerList = new List<SingerObject>();
         //Singers
         [DataMember]
@@ -90,8 +98,11 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.TrackerList.Clear();
             this.TrackerList.Add(new TrackerObject(0));
             this.TrackerList[0].PartList.Add(new PartsObject());
+            this.TrackerList[0].PartList[0].PartName = "UnnamedPart";
+            this.BackerList[0].WavPartList.Add(new WavePartsObject());
+            this.BackerList[0].WavPartList[0].PartName = "UnnamedWavPart";
+            this.BackerList[0].WavPartList[0].DuringTime = 1;
             this.SingerList.Clear();
-            this.SingerList.Add(new SingerObject());
         }
 
         public double Tick2Time(long Tick)

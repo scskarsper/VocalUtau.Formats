@@ -97,7 +97,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _BaseTempo = value; }
         }
 
-        double _Tempo = 120.0;
+        double _Tempo = double.NaN;
 
         public double getRealTempo()
         {
