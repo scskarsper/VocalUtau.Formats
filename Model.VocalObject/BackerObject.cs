@@ -8,6 +8,7 @@ using System.Text;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
+    [Serializable]
     [DataContract]
     public class BackerObject : IComparable,  ICloneable, ITrackerInterface, IComparer<BackerObject>
     {

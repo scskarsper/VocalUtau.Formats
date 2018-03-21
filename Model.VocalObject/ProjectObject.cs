@@ -8,6 +8,7 @@ using VocalUtau.Formats.Model.Utils;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
+    [Serializable]
     [DataContract]
     public class ProjectObject:SerializeableObject<ProjectObject>
     {

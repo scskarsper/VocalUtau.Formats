@@ -73,6 +73,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
     }
 
+    [Serializable]
     [DataContract]
     public class SerializeableObject<T>
     {

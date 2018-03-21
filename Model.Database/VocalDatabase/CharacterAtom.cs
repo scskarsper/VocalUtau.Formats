@@ -5,6 +5,7 @@ using System.Text;
 
 namespace VocalUtau.Formats.Model.Database.VocalDatabase
 {
+    [Serializable]
     public class CharacterAtom
     {
         public CharacterAtom()
