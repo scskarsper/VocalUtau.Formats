@@ -61,6 +61,40 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _DuringTime = value; }
         }
 
+        double realDuringTime = -1;
+        public double getRealDuringTime(bool forceReload=false)
+        {
+            if (realDuringTime < 0 || forceReload)
+            {
+                if (System.IO.File.Exists(wavfilename))
+                {
+                    TimeSpan ts;
+                    try
+                    {
+                        using (NAudio.Wave.AudioFileReader audioFileReader = new NAudio.Wave.AudioFileReader(wavfilename))
+                        {
+                            ts = audioFileReader.TotalTime;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        realDuringTime = 0;
+                        return 0;
+                    }
+                    realDuringTime = ts.TotalSeconds;
+                    return ts.TotalSeconds;
+                }
+                else
+                {
+                    realDuringTime = 0;
+                    return 0;
+                }
+            }
+            else
+            {
+                return realDuringTime;
+            }
+        }
 
         double _StartTime = 0;
 
