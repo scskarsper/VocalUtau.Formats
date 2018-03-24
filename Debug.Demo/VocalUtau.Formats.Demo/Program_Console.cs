@@ -12,7 +12,7 @@ namespace VocalUtau.Formats.Demo
 {
     static class Program_Console
     { 
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             long rt = (int)(MidiMathUtils.Tick2Time((long)(480), 180) * 1000);
             long rb = UtauToolUtils.Resampler_SortNear50((int)rt);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using VocalUtau.Formats.Model.VocalObject;
+using VocalUtau.Formats.Model.VocalObject.ParamTranslater;
 
 namespace VocalUtau.Formats.Model.USTs.Original
 {
@@ -176,6 +177,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
                 }
             }
             //po.TickLength = TotalTick;
+            po.PitchCompiler.InitPitchBase();
             return po;
         }
     }

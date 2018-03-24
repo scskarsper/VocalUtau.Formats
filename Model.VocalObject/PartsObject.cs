@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using VocalUtau.Formats.Model.VocalObject.ParamTranslater;
+using VocalUtau.Formats.Model.BaseObject;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
@@ -13,6 +15,22 @@ namespace VocalUtau.Formats.Model.VocalObject
     [DataContract]
     public class PartsObject : IComparable, IComparer<PartsObject>, ICloneable,IPartsInterface
     {
+        [NonSerialized]
+        PitchCompiler _PitchCompiler;
+        [IgnoreDataMember]
+        public PitchCompiler PitchCompiler
+        {
+            get { return _PitchCompiler; }
+        }
+
+        [NonSerialized]
+        DynCompiler _DynCompiler;
+        [IgnoreDataMember]
+        public DynCompiler DynCompiler
+        {
+            get { return _DynCompiler; }
+        }
+
         string _GUID = "";
 
         [DataMember]
@@ -30,11 +48,17 @@ namespace VocalUtau.Formats.Model.VocalObject
         public PartsObject()
         {
             _GUID = Guid.NewGuid().ToString();
+            PartsObject po = this;
+            _PitchCompiler = new PitchCompiler(ref po);
+            _DynCompiler = new DynCompiler(ref po);
         }
         public PartsObject(string PartName)
         {
             _PartName = PartName;
             _GUID = Guid.NewGuid().ToString();
+            PartsObject po = this;
+            _PitchCompiler = new PitchCompiler(ref po);
+            _DynCompiler = new DynCompiler(ref po);
         }
 
         string _SingerGUID = "";
@@ -111,9 +135,6 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _Tempo = value; }
         }
 
-        //long _TickLength = 0;
-
-      //  [DataMember]
         public long TickLength
         {
             get { if (NoteList.Count == 0)return 480;
@@ -187,7 +208,8 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
         List<NoteObject> _NoteList = new List<NoteObject>();
-        List<PitchObject> _PitchList = new List<PitchObject>();
+        TickSortList<PitchObject> _PitchList = new TickSortList<PitchObject>();
+        private TickSortList<ControlObject> _DynList = new TickSortList<ControlObject>();
 
         [DataMember]
         public List<NoteObject> NoteList
@@ -196,15 +218,20 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _NoteList = value; }
         }
 
-        SortedDictionary<string, List<ControlObject>> _FullCurves = new SortedDictionary<string, List<ControlObject>>();
-
         [DataMember]
-        public SortedDictionary<string, List<ControlObject>> FullCurves
+        public TickSortList<ControlObject> DynList
         {
-            get { return _FullCurves; }
-            set { _FullCurves = value; }
+            get { return _DynList; }
+            set { _DynList = value; }
         }
 
+        [DataMember]
+        public TickSortList<PitchObject> PitchList
+        {
+            get { return _PitchList; }
+            set { _PitchList = value; }
+        }
+        
         private int _DynBaseValue = 100;
 
         [DataMember]
@@ -212,21 +239,6 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { return _DynBaseValue; }
             set { _DynBaseValue = value; }
-        }
-
-        private List<ControlObject> _DynList = new List<ControlObject>();
-        [DataMember]
-        public List<ControlObject> DynList
-        {
-            get { return _DynList; }
-            set { _DynList = value; }
-        }
-
-        [DataMember]
-        public List<PitchObject> PitchBendsList
-        {
-            get { return _PitchList; }
-            set { _PitchList = value; }
         }
 
         public void OrderList()

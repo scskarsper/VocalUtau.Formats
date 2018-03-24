@@ -8,3 +8,6 @@ D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.csproj.GenerateResource.Cache
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.exe
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\obj\Debug\VocalUtau.Formats.Demo.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\System.Data.SQLite.dll
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\NAudio.dll
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\VocalUtau.Formats.Demo\bin\Debug\System.Data.SQLite.xml

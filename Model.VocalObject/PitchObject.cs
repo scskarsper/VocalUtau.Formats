@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using VocalUtau.Formats.Model.BaseObject;
 using VocalUtau.Formats.Model.VocalObject;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class PitchObject : IComparable, IComparer<PitchObject>
+    public class PitchObject : IComparable, IComparer<PitchObject>,ITickSortAtom<PitchObject>
     {
         [DataMember]
         public long Tick { get; set; }
@@ -28,6 +29,18 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             this.pvp = PitchValue;
             this.Tick = Tick;
+        }
+        public long getTick()
+        {
+            return this.Tick;
+        }
+        public void setTick(long value)
+        {
+            this.Tick = value;
+        }
+        public PitchObject getThis()
+        {
+            return this;
         }
         PitchAtomObject pvp = new PitchAtomObject(60);
         [IgnoreDataMember]

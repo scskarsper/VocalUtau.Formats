@@ -34,6 +34,15 @@ namespace VocalUtau.Formats.Model.VocalObject
             js.WriteObject(msObj, Object);
             msObj.Close();
         }
+        public void SerializeToZipFile(T Object, string FileName)
+        {
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
+            FileStream msObj = new FileStream(FileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            ICSharpCode.SharpZipLib.GZip.GZipOutputStream bzo = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(msObj);
+            js.WriteObject(bzo, Object);
+            bzo.Close();
+            msObj.Close();
+        }
     }
     public class ObjectDeserializer<T>
     {
@@ -61,6 +70,28 @@ namespace VocalUtau.Formats.Model.VocalObject
                 using(StreamReader sr=new StreamReader(fs))
                 {
                     toDes=sr.ReadToEnd();
+                }
+            }
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(toDes)))
+            {
+                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(T));
+                T model = (T)deseralizer.ReadObject(ms);// 
+                ret = model;
+            }
+            return ret;
+        }
+        public T DeserializeFromZipFile(string FileName)
+        {
+            T ret = default(T);
+            string toDes = "";
+            using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                using (ICSharpCode.SharpZipLib.GZip.GZipInputStream bzi = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(fs))
+                {
+                    using (StreamReader sr = new StreamReader(bzi))
+                    {
+                        toDes = sr.ReadToEnd();
+                    }
                 }
             }
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(toDes)))

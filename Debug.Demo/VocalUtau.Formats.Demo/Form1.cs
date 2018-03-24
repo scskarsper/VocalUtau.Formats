@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using VocalUtau.Formats.Model.VocalSqlObject;
 
 namespace VocalUtau.Formats.Demo
 {
@@ -14,6 +15,12 @@ namespace VocalUtau.Formats.Demo
         public Form1()
         {
             InitializeComponent();
+        }
+        ProjectVector vector = new ProjectVector();
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            string tempfile=ProjectVector.createNewProjectFile();
+            vector.loadProjectFile(tempfile);
         }
     }
 }
