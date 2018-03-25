@@ -48,7 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model.BaseObject\ITickSortAtom.cs" />
+    <Compile Include="Model.BaseObject\DesCooler.cs" />
+    <Compile Include="Model.BaseObject\ProjectCooler.cs" />
     <Compile Include="Model.BaseObject\TickSortList.cs" />
     <Compile Include="Model.Database\VocalDatabase\CharacterAtom.cs" />
     <Compile Include="Model.Database\VocalDatabase\SoundAtom.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Model.Utils\UtauRendCommanderUtils.cs" />
     <Compile Include="Model.Utils\UtauToolUtils.cs" />
     <Compile Include="Model.VocalObject\BackerObject.cs" />
+    <Compile Include="Model.VocalObject\BasicFileInformation.cs" />
     <Compile Include="Model.VocalObject\IPartsInterface.cs" />
     <Compile Include="Model.VocalObject\ITrackerInterface.cs" />
     <Compile Include="Model.VocalObject\NoteAtomObject.cs" />
@@ -68,7 +70,6 @@
     <Compile Include="Model.VocalObject\ObjectSerializer.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\DynCompiler.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\FastFinder.cs" />
-    <Compile Include="Model.VocalObject\ParamTranslater\NoteCompiler.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\PitchCompiler.cs" />
     <Compile Include="Model.VocalObject\PartsObject.cs" />
     <Compile Include="Model.VocalObject\PitchObject.cs" />

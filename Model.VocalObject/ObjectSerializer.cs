@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
 using System.Text;
+using VocalUtau.Formats.Model.BaseObject;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
@@ -12,6 +14,21 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         public ObjectSerializer()
         {
+        }
+        private BasicFileInformation GetBasicFileInformation(T Object)
+        {
+            try
+            {
+                Type type = typeof(T);
+                System.Reflection.PropertyInfo pi = type.GetProperty("BasicData");
+                object res=pi.GetValue(Object, null);
+                if (res is BasicFileInformation)
+                {
+                    return (BasicFileInformation)res;
+                }
+            }
+            catch { ; }
+            return new BasicFileInformation();
         }
         public string Serialize(T Object)
         {
@@ -27,19 +44,60 @@ namespace VocalUtau.Formats.Model.VocalObject
             msObj.Close();
             return json;
         }
+        public void WriteBasicInformation(T Object, Stream target)
+        {
+            BasicFileInformation bfi = GetBasicFileInformation(Object);
+            byte[] itext=System.Text.UTF8Encoding.UTF8.GetBytes(bfi.IntroduceText);
+            byte[] iver=System.Text.UTF8Encoding.UTF8.GetBytes(bfi.VersionString);
+
+            string pwd = bfi.SavePassword;
+
+            BinaryWriter sw = new BinaryWriter(target);
+            sw.Write(new char[] { 'V', 'U', 'P', 'J' });
+            sw.Write(iver.Length);
+            sw.Write(iver);
+            sw.Write(itext.Length);
+            sw.Write(itext);
+            sw.Write(pwd.Length > 0?1:0);
+            sw.Write(new char[] { 'D', 'A', 'T', 'A' });
+            sw.Flush();
+        }
         public void SerializeToFile(T Object, string FileName)
         {
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
             FileStream msObj = new FileStream(FileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-            js.WriteObject(msObj, Object);
+            BasicFileInformation bfi = GetBasicFileInformation(Object);
+            string pwd = bfi.SavePassword;
+            WriteBasicInformation(Object, msObj);
+            if (pwd.Length > 0)
+            {
+                CryptoStream cs = DesCooler.CreateEncryptStream(pwd, msObj);
+                js.WriteObject(cs, Object);
+            }
+            else
+            {
+                js.WriteObject(msObj, Object);
+            }
             msObj.Close();
         }
         public void SerializeToZipFile(T Object, string FileName)
         {
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
             FileStream msObj = new FileStream(FileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-            ICSharpCode.SharpZipLib.GZip.GZipOutputStream bzo = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(msObj);
+            BasicFileInformation bfi = GetBasicFileInformation(Object);
+            string pwd = bfi.SavePassword;
+            WriteBasicInformation(Object, msObj);
+            ICSharpCode.SharpZipLib.GZip.GZipOutputStream bzo;
+            if (pwd.Length > 0)
+            {
+                CryptoStream cs = DesCooler.CreateEncryptStream(pwd, msObj);
+                bzo = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(cs);
+            }else
+            {
+                bzo = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(msObj);
+            }
             js.WriteObject(bzo, Object);
+
             bzo.Close();
             msObj.Close();
         }
@@ -48,6 +106,32 @@ namespace VocalUtau.Formats.Model.VocalObject
     {
         public ObjectDeserializer()
         {
+        }
+        private void SetBasicFileInformation(T Object, BasicFileInformation Data)
+        {
+            try
+            {
+                if (Data == null) Data = new BasicFileInformation();
+                Type type = typeof(T);
+                System.Reflection.PropertyInfo pi = type.GetProperty("BasicData");
+                pi.SetValue(Object, Data, null);
+            }
+            catch { ; }
+        }
+        private BasicFileInformation GetBasicFileInformation(T Object)
+        {
+            try
+            {
+                Type type = typeof(T);
+                System.Reflection.PropertyInfo pi = type.GetProperty("BasicData");
+                object res = pi.GetValue(Object, null);
+                if (res is BasicFileInformation)
+                {
+                    return (BasicFileInformation)res;
+                }
+            }
+            catch { ; }
+            return new BasicFileInformation();
         }
         public T Deserialize(string Json)
         {
@@ -61,34 +145,63 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
             return ret;
         }
-        public T DeserializeFromFile(string FileName)
+        private BasicFileInformation ReadBasicInformation(Stream target)
+        {
+            BasicFileInformation ret = new BasicFileInformation();
+            byte[] tmp;
+            BinaryReader br = new BinaryReader(target);
+            tmp = br.ReadBytes(4);
+            string ts1 = System.Text.ASCIIEncoding.ASCII.GetString(tmp);
+            if (ts1 == "VUPJ")
+            {
+                int verlen = br.ReadInt32();
+                byte[] verarr = br.ReadBytes(verlen);
+                string ver = System.Text.UTF8Encoding.UTF8.GetString(verarr);
+                int txtlen = br.ReadInt32();
+                byte[] txtarr = br.ReadBytes(txtlen);
+                string txt = System.Text.UTF8Encoding.UTF8.GetString(txtarr);
+                bool havePwd = br.ReadInt32()==1?true:false;
+                ret.SavePassword = havePwd?"There is a lovely fox jumped up the pig":"";
+                ret.IntroduceText = txt;
+                ret.VersionString = ver;
+            }
+            return ret;
+        }
+        private int BasicInformationSize(BasicFileInformation FileInfo)
+        {
+            if (FileInfo == null) return 0;
+            byte[] itext = System.Text.UTF8Encoding.UTF8.GetBytes(FileInfo.IntroduceText);
+            byte[] iver = System.Text.UTF8Encoding.UTF8.GetBytes(FileInfo.VersionString);
+            int ret = 4 + 4 + 4 * 3 + itext.Length + iver.Length;
+            return ret;
+        }
+        public BasicFileInformation ReadBasicInformation(string FileName)
+        {
+            BasicFileInformation ret = new BasicFileInformation();
+            using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                ret=ReadBasicInformation(fs);
+            }
+            return ret;
+        }
+        public T DeserializeFromFile(string FileName,BasicFileInformation FileInfo)
         {
             T ret = default(T);
             string toDes = "";
             using(FileStream fs=new FileStream(FileName,FileMode.Open,FileAccess.ReadWrite,FileShare.ReadWrite))
             {
-                using(StreamReader sr=new StreamReader(fs))
+                fs.Seek(BasicInformationSize(FileInfo), SeekOrigin.Begin);
+                if (FileInfo.SavePassword.Length > 0)
                 {
-                    toDes=sr.ReadToEnd();
+                    CryptoStream cs = DesCooler.CreateDecryptStream(FileInfo.SavePassword, fs);
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        toDes = sr.ReadToEnd();
+                    }
                 }
-            }
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(toDes)))
-            {
-                DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(T));
-                T model = (T)deseralizer.ReadObject(ms);// 
-                ret = model;
-            }
-            return ret;
-        }
-        public T DeserializeFromZipFile(string FileName)
-        {
-            T ret = default(T);
-            string toDes = "";
-            using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                using (ICSharpCode.SharpZipLib.GZip.GZipInputStream bzi = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(fs))
+                else
                 {
-                    using (StreamReader sr = new StreamReader(bzi))
+                    using (StreamReader sr = new StreamReader(fs))
                     {
                         toDes = sr.ReadToEnd();
                     }
@@ -99,6 +212,54 @@ namespace VocalUtau.Formats.Model.VocalObject
                 DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(T));
                 T model = (T)deseralizer.ReadObject(ms);// 
                 ret = model;
+            }
+            return ret;
+        }
+        public T DeserializeFromZipFile(string FileName, BasicFileInformation FileInfo)
+        {
+            T ret = default(T);
+            string toDes = "";
+            using (FileStream fs = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                fs.Seek(BasicInformationSize(FileInfo), SeekOrigin.Begin);
+                ICSharpCode.SharpZipLib.GZip.GZipInputStream bzi;
+                if(FileInfo.SavePassword.Length>0)
+                {
+                    CryptoStream cs = DesCooler.CreateDecryptStream(FileInfo.SavePassword, fs);
+                    bzi = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(cs);
+                }else
+                {
+                    bzi = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(fs);
+                }
+                using (StreamReader sr = new StreamReader(bzi))
+                {
+                    try
+                    {
+                        toDes = sr.ReadToEnd();
+                    }
+                    catch (ICSharpCode.SharpZipLib.GZip.GZipException e) { try { bzi.Close(); } catch { ;}; throw new Exception("Password Error or File Broken"); return default(T); }
+                }
+                bzi.Close();
+            }
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(toDes)))
+            {
+                try
+                {
+                    DataContractJsonSerializer deseralizer = new DataContractJsonSerializer(typeof(T));
+                    T model = (T)(deseralizer.ReadObject(ms));// 
+                    ProjectCooler.FitableProject(model);
+                    ret = model;
+                }
+                catch { ;}
+            }
+            if (ret != null)
+            {
+                BasicFileInformation bfi = GetBasicFileInformation(ret);
+                if (bfi != null)
+                {
+                    bfi.VersionString = FileInfo.VersionString;
+                    bfi.IntroduceText = FileInfo.VersionString;
+                }
             }
             return ret;
         }

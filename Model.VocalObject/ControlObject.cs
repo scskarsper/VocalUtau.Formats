@@ -10,7 +10,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class ControlObject : IComparable, IComparer<ControlObject>, ITickSortAtom<ControlObject>
+    public class ControlObject : IComparable, IComparer<ControlObject>
     {
         [DataMember]
         public long Tick { get; set; }
@@ -20,18 +20,6 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             this.Value = Value;
             this.Tick = Tick;
-        }
-        public long getTick()
-        {
-            return this.Tick;
-        }
-        public void setTick(long value)
-        {
-            this.Tick = value;
-        }
-        public ControlObject getThis()
-        {
-            return this;
         }
         public int CompareTo(Object o)
         {

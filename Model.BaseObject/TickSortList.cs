@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace VocalUtau.Formats.Model.BaseObject
 {
+    [Serializable]
+    [DataContract]
     public class TickSortList<T>
     {
         static int _TickStep = 5;
@@ -21,13 +24,14 @@ namespace VocalUtau.Formats.Model.BaseObject
             return (long)(Math.Floor(Tbarker) * _TickStep);
         }
 
-        SortedList<long, ITickSortAtom<T>> _baseList = new SortedList<long, ITickSortAtom<T>>();
+        SortedList<long, T> _baseList = new SortedList<long, T>();
 
-        /*public SortedList<long, ITickSortAtom<T>> BaseList
+        [DataMember]
+        public SortedList<long, T> BaseList
         {
             get { return _baseList; }
             set { _baseList = value; }
-        }*/
+        }
         public TickSortList()
         {
 
@@ -39,21 +43,21 @@ namespace VocalUtau.Formats.Model.BaseObject
                 return _baseList.Count;
             }
         }
-        public ITickSortAtom<T> this[
+        public T this[
             int index
             ] { 
             get { return this.getIndex(index); }
             set { this.setIndex(index, value); }
         }
 
-        public ITickSortAtom<T> getIndex(int Index)
+        public T getIndex(int Index)
         {
             return _baseList[TickFormat(_baseList.Keys[Index])];
         }
-        public void setIndex(int Index,ITickSortAtom<T> value)
+        public void setIndex(int Index,T value)
         {
             long Key = TickFormat(_baseList.Keys[Index]);
-            if (Key == TickFormat(value.getTick()))
+            if (Key == TickFormat(GetTick(value)))
             {
                 _baseList[Key] = value;
             }
@@ -70,26 +74,49 @@ namespace VocalUtau.Formats.Model.BaseObject
             if (OldTick == NewTick) return;
             if (_baseList.ContainsKey(OldTick))
             {
-                ITickSortAtom<T> value = _baseList[OldTick];
+                T value = _baseList[OldTick];
                 _baseList.Remove(OldTick);
-                value.setTick(NewTick);
+                SetTick(value, NewTick);
                 Add(value);
             };
         }
         public T getData(long Tick)
         {
             Tick = TickFormat(Tick);
-            return (T)_baseList[Tick];
-        }
-        public void Add(T value)
-        {
-            this.Add((ITickSortAtom<T>)value);
+            object obj=_baseList[Tick];
+            if(!(obj is T))
+            {
+                return default(T);
+            }
+            return (T)obj;
         }
         private static readonly object locker = new object();
-        public void Add(ITickSortAtom<T> value)
+
+        private long GetTick(T value)
         {
-            long TV = TickFormat(value.getTick());
-            value.setTick(TickFormat(value.getTick()));
+            try
+            {
+                Type type = typeof(T);
+                System.Reflection.PropertyInfo pi = type.GetProperty("Tick");
+                return (long)pi.GetValue(value, null);
+            }
+            catch { return -1; }
+        }
+        private void SetTick(T value,long Tick)
+        {
+            try
+            {
+                Type type = typeof(T);
+                System.Reflection.PropertyInfo pi = type.GetProperty("Tick");
+                pi.SetValue(value, Tick, null);
+            }
+            catch { ; }
+        }  
+
+        public void Add(T value)
+        {
+            long TV = TickFormat(GetTick(value));
+            SetTick(value,TickFormat(GetTick(value)));
             if (_baseList.ContainsKey(TV))
             {
                 _baseList[TV] = value;
@@ -106,19 +133,19 @@ namespace VocalUtau.Formats.Model.BaseObject
         {
             _baseList.Clear();
         }
-        public bool Contains(ITickSortAtom<T> value)
+        public bool Contains(T value)
         {
             return _baseList.ContainsValue(value);
         }
-        public void CopyTo(ITickSortAtom<T>[] array, Int32 index)
+        public void CopyTo(T[] array, Int32 index)
         {
             _baseList.Values.CopyTo(array, index);
         }
-        public System.Collections.Generic.IEnumerator<ITickSortAtom<T>> GetEnumerator()
+        public System.Collections.Generic.IEnumerator<T> GetEnumerator()
         {
             return _baseList.Values.GetEnumerator();
         }
-        public int IndexOf(ITickSortAtom<T> value)
+        public int IndexOf(T value)
         {
             return _baseList.IndexOfValue(value);
         }
@@ -127,7 +154,7 @@ namespace VocalUtau.Formats.Model.BaseObject
             Tick = TickFormat(Tick);
             return _baseList.IndexOfKey(Tick);
         }
-        public bool Remove(ITickSortAtom<T> value)
+        public bool Remove(T value)
         {
             int Inx=IndexOf(value);
             if(Inx>=0)
@@ -168,13 +195,6 @@ namespace VocalUtau.Formats.Model.BaseObject
         public void AddRange(List<T> Array)
         {
             for (int i = 0; i < Array.Count; i++)
-            {
-                Add(Array[i]);
-            };
-        }
-        public void AddRange(ITickSortAtom<T>[] Array)
-        {
-            for (int i = 0; i < Array.Length;i++ )
             {
                 Add(Array[i]);
             };

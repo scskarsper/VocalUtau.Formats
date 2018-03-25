@@ -10,7 +10,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class PitchObject : IComparable, IComparer<PitchObject>,ITickSortAtom<PitchObject>
+    public class PitchObject : IComparable, IComparer<PitchObject>
     {
         [DataMember]
         public long Tick { get; set; }
@@ -29,18 +29,6 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             this.pvp = PitchValue;
             this.Tick = Tick;
-        }
-        public long getTick()
-        {
-            return this.Tick;
-        }
-        public void setTick(long value)
-        {
-            this.Tick = value;
-        }
-        public PitchObject getThis()
-        {
-            return this;
         }
         PitchAtomObject pvp = new PitchAtomObject(60);
         [IgnoreDataMember]

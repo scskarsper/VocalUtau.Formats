@@ -20,7 +20,14 @@ namespace VocalUtau.Formats.Model.VocalObject
         [IgnoreDataMember]
         public PitchCompiler PitchCompiler
         {
-            get { return _PitchCompiler; }
+            get
+            {
+                if (_PitchCompiler == null)
+                {
+                    PartsObject po = this; _PitchCompiler = new PitchCompiler(ref po);
+                }; 
+                return _PitchCompiler;
+            }
         }
 
         [NonSerialized]
@@ -28,7 +35,14 @@ namespace VocalUtau.Formats.Model.VocalObject
         [IgnoreDataMember]
         public DynCompiler DynCompiler
         {
-            get { return _DynCompiler; }
+            get
+            {
+                if (_DynCompiler == null)
+                {
+                    PartsObject po = this; _DynCompiler = new DynCompiler(ref po);
+                };
+                return _DynCompiler;
+            }
         }
 
         string _GUID = "";
@@ -210,6 +224,14 @@ namespace VocalUtau.Formats.Model.VocalObject
         List<NoteObject> _NoteList = new List<NoteObject>();
         TickSortList<PitchObject> _PitchList = new TickSortList<PitchObject>();
         private TickSortList<ControlObject> _DynList = new TickSortList<ControlObject>();
+        TickSortList<PitchObject> _BasePitchList = new TickSortList<PitchObject>();
+
+        [IgnoreDataMember]
+        public TickSortList<PitchObject> BasePitchList
+        {
+            get { return _BasePitchList; }
+            set { _BasePitchList = value; }
+        }
 
         [DataMember]
         public List<NoteObject> NoteList

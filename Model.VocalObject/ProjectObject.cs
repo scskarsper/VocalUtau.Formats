@@ -12,6 +12,14 @@ namespace VocalUtau.Formats.Model.VocalObject
     [DataContract]
     public class ProjectObject:SerializeableObject<ProjectObject>
     {
+        private BasicFileInformation _BasicData = new BasicFileInformation();
+        [DataMember]
+        public BasicFileInformation BasicData
+        {
+            get { return _BasicData; }
+            set { _BasicData = value; }
+        }
+
         string _projectName = "";
 
         [DataMember]
@@ -47,12 +55,18 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { baseTempo = value;
             if (baseTempo < 30) baseTempo = 30;
             if (baseTempo > 300) baseTempo = 500;
-            for (int i = 0; i < TrackerList.Count; i++)
+            if (TrackerList != null)
             {
-                for (int j = 0; j < TrackerList[i].PartList.Count; j++)
+                for (int i = 0; i < TrackerList.Count; i++)
                 {
+                    if (TrackerList[i].PartList != null)
+                    {
+                        for (int j = 0; j < TrackerList[i].PartList.Count; j++)
+                        {
 
-                    TrackerList[i].PartList[j].BaseTempo = baseTempo;
+                            TrackerList[i].PartList[j].BaseTempo = baseTempo;
+                        }
+                    }
                 }
             }
             }

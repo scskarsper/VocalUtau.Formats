@@ -20,13 +20,6 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
             PitchCache.Clear();
         }
 
-        TickSortList<PitchObject> _BasePitchList = new TickSortList<PitchObject>();
-
-        public TickSortList<PitchObject> BasePitchList
-        {
-            get { return _BasePitchList; }
-            set { _BasePitchList = value; }
-        }
         PartsObject partsObject;
         public PitchCompiler(ref PartsObject part)
         {
@@ -41,51 +34,6 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         {
             if (partsObject.PitchList.Count == 0) partsObject.PitchList.Add(new PitchObject(0, 0));
             ClearCache();
-            /*partsObject.NoteList.Sort();
-            PartsObject.PitchList.Sort();
-            long MaxLength = 480;
-            if (partsObject.NoteList.Count > 0)
-            {
-                MaxLength = partsObject.NoteList[partsObject.NoteList.Count - 1].Tick + partsObject.NoteList[partsObject.NoteList.Count - 1].Length;
-            }
-            if (PartsObject.PitchList.Count == 0)
-            {
-                for (int i = 0; i < MaxLength; i++)
-                {
-                    PartsObject.PitchList.Add(new PitchObject(i, 0));
-                }
-            }
-            else
-            {
-                long lastTick = 0;
-                double lastPitch=0;
-                int TotalCount=PartsObject.PitchList.Count;
-                if (TotalCount > 0 && PartsObject.PitchList[0].Tick > 0)
-                {
-                    PartsObject.PitchList.Add(new PitchObject(0, 0));
-                }
-                for (int i = 0; i < TotalCount; i++)
-                {
-                    if (PartsObject.PitchList[i].Tick - lastTick > 1)
-                    {
-                        for(long j=lastTick+1;j<PartsObject.PitchList[i].Tick;j++)
-                        {
-                            PartsObject.PitchList.Add(new PitchObject(j, lastPitch));
-                        }
-                    }
-                    lastTick = PartsObject.PitchList[i].Tick;
-                    lastPitch = PartsObject.PitchList[i].PitchValue.PitchValue;
-                }
-                PitchObject lo = PartsObject.PitchList[TotalCount - 1];
-                if(lo.Tick < MaxLength)
-                {
-                    for (long i = lo.Tick + 1; i <= MaxLength; i++)
-                    {
-                        PartsObject.PitchList.Add(new PitchObject(i, lo.PitchValue.PitchValue));
-                    }
-                }
-                PartsObject.PitchList.Sort();
-            }*/
         }
         public void SetupBasePitch_Aysnc(AsyncWorkCallbackHandler CallBack, int NoteStartIndex = 0, int NoteEndIndex = -1)
         {
@@ -119,7 +67,8 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         }
         public void SetupBasePitch(int NoteStartIndex = 0, int NoteEndIndex = -1)
         {
-            if (partsObject.NoteList.Count == 0) { _BasePitchList.Clear(); return; }
+            if (partsObject.BasePitchList == null) partsObject.BasePitchList = new TickSortList<PitchObject>();
+            if (partsObject.NoteList.Count == 0) { partsObject.BasePitchList.Clear(); return; }
             if (NoteEndIndex < 0) NoteEndIndex = partsObject.NoteList.Count - 1;
             if (NoteStartIndex < 0) NoteStartIndex = 0;
             if (NoteEndIndex > partsObject.NoteList.Count - 1) NoteEndIndex = partsObject.NoteList.Count - 1;
@@ -146,7 +95,7 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 EsTick = GetNoteEnd(NoteEndIndex);
                 LastTick = EsTick - calcTransLength(NoteEndIndex, true);
             }
-            TickSortList<PitchObject> BPL = _BasePitchList;
+            TickSortList<PitchObject> BPL = partsObject.BasePitchList;
             Console.WriteLine("BeforeClearAreaed:{0}", watch.Elapsed);
             clearPitchList(ref BPL, FirstTick, LastTick);
             Console.WriteLine("ClearAreaed:{0}", watch.Elapsed);
@@ -159,7 +108,7 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     {
                         NoteObject curObj = partsObject.NoteList[0];
                         long StartDirTick = GetNoteStart(0) + calcTransLength(0, false);
-                        _BasePitchList.Add(new PitchObject(0, curObj.PitchValue.PitchValue));
+                        partsObject.BasePitchList.Add(new PitchObject(0, curObj.PitchValue.PitchValue));
                     }
                     else
                     {
@@ -180,22 +129,22 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 }
             };       
             Console.WriteLine("FilledLine:{0}", watch.Elapsed);
-            if (_BasePitchList.Count <= 0)
+            if (partsObject.BasePitchList.Count <= 0)
             {
-                _BasePitchList.Add(new PitchObject(0, 60));
+                partsObject.BasePitchList.Add(new PitchObject(0, 60));
             }
-            else if(_BasePitchList[0].getTick()!=0)
+            else if(partsObject.BasePitchList[0].Tick!=0)
             {
-                _BasePitchList.Add(new PitchObject(0, _BasePitchList[0].getThis().PitchValue.PitchValue));
+                partsObject.BasePitchList.Add(new PitchObject(0, partsObject.BasePitchList[0].PitchValue.PitchValue));
             }
             //防止头部出错
-            if (NoteStartIndex!=0 && partsObject.NoteList.Count > 0 && _BasePitchList[0].getThis().PitchValue.PitchValue != partsObject.NoteList[0].PitchValue.PitchValue)
+            if (NoteStartIndex!=0 && partsObject.NoteList.Count > 0 && partsObject.BasePitchList[0].PitchValue.PitchValue != partsObject.NoteList[0].PitchValue.PitchValue)
             {
                 SetupBasePitch(0, 0);
                 return;
             }
             //防止尾巴部出错
-            if (NoteEndIndex != partsObject.NoteList.Count - 1 && partsObject.NoteList.Count > 0 && _BasePitchList[_BasePitchList.Count - 1].getThis().PitchValue.PitchValue != partsObject.NoteList[partsObject.NoteList.Count - 1].PitchValue.PitchValue)
+            if (NoteEndIndex != partsObject.NoteList.Count - 1 && partsObject.NoteList.Count > 0 && partsObject.BasePitchList[partsObject.BasePitchList.Count - 1].PitchValue.PitchValue != partsObject.NoteList[partsObject.NoteList.Count - 1].PitchValue.PitchValue)
             {
                 SetupBasePitch(partsObject.NoteList.Count - 1, partsObject.NoteList.Count - 1);
                 return;
@@ -212,10 +161,10 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
             {
                 if (ClearBefore)
                 {
-                    TickSortList<PitchObject> BPL = _BasePitchList;
+                    TickSortList<PitchObject> BPL = partsObject.BasePitchList;
                     clearPitchList(ref BPL, TStart, TEnd);
                 }
-                _BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
             }
             else
             {
@@ -224,13 +173,13 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 if (TEnd > TPEnd) TEnd = TPEnd;
                 if (ClearBefore)
                 {
-                    TickSortList<PitchObject> BPL = _BasePitchList;
+                    TickSortList<PitchObject> BPL = partsObject.BasePitchList;
                     clearPitchList(ref BPL, TStart, TPEnd);
                 }
-                _BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
                 for (long i = TEnd+1; i <= TPEnd; i++)
                 {
-                    _BasePitchList.Add(new PitchObject(i, GetNotePitchValue(nxtObjIndex)));
+                    partsObject.BasePitchList.Add(new PitchObject(i, GetNotePitchValue(nxtObjIndex)));
                 }
             
             }
@@ -312,18 +261,18 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 return BaseCache[tick];
             }
             /*
-            List<PitchObject> pol = _BasePitchList;
+            List<PitchObject> pol = partsObject.BasePitchList;
             int i = FastFinder.FindPointIndex(tick, ref pol, 0, pol.Count);
             double value = 0;
             if (i >= 0)
             {
                 value = pol[i].PitchValue.PitchValue;
             }*/
-            long newTick=_BasePitchList.FindNearestTick(tick);
+            long newTick=partsObject.BasePitchList.FindNearestTick(tick);
             if (newTick != -1)
             {
-                BaseCache.Add(tick, _BasePitchList.getData(newTick).PitchValue.PitchValue);
-                return _BasePitchList.getData(newTick).PitchValue.PitchValue;
+                BaseCache.Add(tick, partsObject.BasePitchList.getData(newTick).PitchValue.PitchValue);
+                return partsObject.BasePitchList.getData(newTick).PitchValue.PitchValue;
             }
             else
             {
@@ -332,6 +281,10 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         }
         public double getPitch(long tick)
         {
+            if (this.partsObject.PitchList.Count == 0)
+            {
+                this.partsObject.PitchList.Add(new PitchObject(0, 0));
+            }
             if (PitchCache.ContainsKey(tick))
             {
                 return PitchCache[tick];
