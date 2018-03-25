@@ -40,7 +40,10 @@ namespace VocalUtau.Formats.Model.BaseObject
         }
         static void FitPartsObject(PartsObject proj)
         {
-            proj.PitchCompiler.InitPitchBase();
+            if (proj.BasePitchList == null)
+            {
+                proj.PitchCompiler.InitPitchBase();
+            }
         }
         public static void FitableProject(object Object)
         {
