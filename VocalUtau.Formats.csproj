@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeepCloner, Version=0.10.0.0, Culture=neutral, PublicKeyToken=dc0b95cf99bf4e99, processorArchitecture=MSIL">
+      <HintPath>..\..\VocalUtau\packages\DeepCloner.0.10.2\lib\net40\DeepCloner.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\VocalUtau\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -70,6 +74,7 @@
     <Compile Include="Model.VocalObject\ObjectSerializer.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\DynCompiler.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\FastFinder.cs" />
+    <Compile Include="Model.VocalObject\ParamTranslater\NoteCompiler.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\PitchCompiler.cs" />
     <Compile Include="Model.VocalObject\PartsObject.cs" />
     <Compile Include="Model.VocalObject\PitchObject.cs" />

@@ -253,7 +253,8 @@ namespace VocalUtau.Formats.Model.VocalObject
                 if (bfi != null)
                 {
                     bfi.VersionString = FileInfo.VersionString;
-                    bfi.IntroduceText = FileInfo.VersionString;
+                    bfi.IntroduceText = FileInfo.IntroduceText;
+                    bfi.ProjectFilePath = (new System.IO.FileInfo(FileName)).FullName;
                 }
             }
             return ret;

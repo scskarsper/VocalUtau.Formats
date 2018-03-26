@@ -45,6 +45,16 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
 
+        [NonSerialized]
+        NoteCompiler _NoteCompiler;
+        [IgnoreDataMember]
+
+        public NoteCompiler NoteCompiler
+        {
+            get { if (_NoteCompiler == null) { PartsObject po = this; _NoteCompiler = new NoteCompiler(ref po); }; return _NoteCompiler; }
+            set { _NoteCompiler = value; }
+        }
+
         string _GUID = "";
 
         [DataMember]
@@ -65,6 +75,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             PartsObject po = this;
             _PitchCompiler = new PitchCompiler(ref po);
             _DynCompiler = new DynCompiler(ref po);
+            _NoteCompiler = new NoteCompiler(ref po);
         }
         public PartsObject(string PartName)
         {
@@ -73,6 +84,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             PartsObject po = this;
             _PitchCompiler = new PitchCompiler(ref po);
             _DynCompiler = new DynCompiler(ref po);
+            _NoteCompiler = new NoteCompiler(ref po);
         }
 
         string _SingerGUID = "";
@@ -153,14 +165,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { if (NoteList.Count == 0)return 480;
                 
-            //    return NoteList[NoteList.Count-1].Tick+NoteList[NoteList.Count-1].Length; 
-            
-                long max = 0;
-                for (int i = 0; i < NoteList.Count; i++)
-                {
-                    max = Math.Max(max, NoteList[i].Tick + NoteList[i].Length);
-                }
-                return max;
+                return NoteList[NoteList.Count-1].Tick+NoteList[NoteList.Count-1].Length; 
             }
         }
 
@@ -262,72 +267,10 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _DynBaseValue; }
             set { _DynBaseValue = value; }
         }
-
-        public void OrderList()
-        {
-            long HeadPtr = long.MinValue;
-            _NoteList.Sort();
-            for (int i = 0; i < _NoteList.Count; i++)
-            {
-                if (HeadPtr > _NoteList[i].Tick)
-                {
-                    long NoteEnd = _NoteList[i].Tick + _NoteList[i].Length;
-                    if (NoteEnd > HeadPtr)
-                    {
-                        //后面有多余出来的
-                        _NoteList[i].Length = NoteEnd - HeadPtr;
-                        _NoteList[i].Tick = HeadPtr;
-                        if (_NoteList[i].Length < 32)
-                        {
-                            //小于32tick，无效音符
-                            _NoteList.RemoveAt(i);
-                            i--;
-                        }
-                        else
-                        {
-                            //切断尾长
-                            HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
-                        }
-                    }
-                    else
-                    {
-                        _NoteList.RemoveAt(i);
-                        i--;
-                    }
-                }
-                else
-                {
-                    HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
-                }
-            }
-        }
-        public bool CheckOrdered()
-        {
-            bool ret = true;
-            long HeadPtr = long.MinValue;
-            _PitchList.Sort();
-            _NoteList.Sort();
-            for (int i = 0; i < _NoteList.Count; i++)
-            {
-                if (HeadPtr > _NoteList[i].Tick)
-                {
-                    ret = false;
-                    break;
-                }
-                HeadPtr = _NoteList[i].Tick + _NoteList[i].Length;
-            }
-            return ret;
-        }
-
+        
         public object Clone()
         {
-            BinaryFormatter Formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone));
-            MemoryStream stream = new MemoryStream();
-            Formatter.Serialize(stream, this);
-            stream.Position = 0;
-            object clonedObj = Formatter.Deserialize(stream);
-            stream.Close();
-            return clonedObj;
+            return Force.DeepCloner.DeepClonerExtensions.DeepClone<PartsObject>(this);
         }
         public int CompareTo(Object o)
         {

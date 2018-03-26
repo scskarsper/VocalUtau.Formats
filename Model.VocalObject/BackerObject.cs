@@ -99,13 +99,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 
         public object Clone()
         {
-            BinaryFormatter Formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone));
-            MemoryStream stream = new MemoryStream();
-            Formatter.Serialize(stream, this);
-            stream.Position = 0;
-            object clonedObj = Formatter.Deserialize(stream);
-            stream.Close();
-            return clonedObj;
+            return Force.DeepCloner.DeepClonerExtensions.DeepClone<BackerObject>(this);
         }
         public int CompareTo(Object o)
         {

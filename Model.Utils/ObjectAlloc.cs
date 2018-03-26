@@ -84,6 +84,24 @@ namespace VocalUtau.Formats.Model.Utils
                 catch { return null; }
             }
         }
+        public T AllocedSource
+        {
+            get
+            {
+                try
+                {
+                    if (handle.Target is T)
+                    {
+                        return (T)(handle.Target);
+                    }
+                    else
+                    {
+                        return default(T);
+                    }
+                }
+                catch { return default(T); }
+            }
+        }
         public IntPtr IntPtr
         {
             get

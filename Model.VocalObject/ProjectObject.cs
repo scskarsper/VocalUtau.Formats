@@ -10,7 +10,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class ProjectObject:SerializeableObject<ProjectObject>
+    public class ProjectObject : SerializeableObject<ProjectObject>, ICloneable
     {
         private BasicFileInformation _BasicData = new BasicFileInformation();
         [DataMember]
@@ -27,14 +27,6 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { return _projectName; }
             set { _projectName = value; }
-        }
-
-        string _projectFilePath = "";
-        [IgnoreDataMember]
-        public string ProjectFilePath
-        {
-            get { return _projectFilePath; }
-            set { _projectFilePath = value; }
         }
 
         List<SingerObject> _singerList = new List<SingerObject>();
@@ -128,6 +120,10 @@ namespace VocalUtau.Formats.Model.VocalObject
         public long Time2Tick(double Time)
         {
             return MidiMathUtils.Time2Tick(Time, baseTempo);
+        }
+        public object Clone()
+        {
+            return Force.DeepCloner.DeepClonerExtensions.DeepClone<ProjectObject>(this);
         }
     }
 }

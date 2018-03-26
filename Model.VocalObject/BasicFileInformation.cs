@@ -40,5 +40,13 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _SavePassword; }
             set { _SavePassword = value; }
         }
+
+        string _projectFilePath = "";
+        [IgnoreDataMember]
+        public string ProjectFilePath
+        {
+            get { return _projectFilePath; }
+            set { _projectFilePath = value; }
+        }
     }
 }

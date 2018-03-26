@@ -8,7 +8,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 {
     [Serializable]
     [DataContract]
-    public class SingerObject
+    public class SingerObject:ICloneable
     {
         string _GUID = "";
 
@@ -103,6 +103,11 @@ namespace VocalUtau.Formats.Model.VocalObject
             {
                 return base.Equals(obj);
             }
+        }
+
+        public object Clone()
+        {
+            return Force.DeepCloner.DeepClonerExtensions.DeepClone<SingerObject>(this);
         }
     }
 }
