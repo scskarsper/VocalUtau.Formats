@@ -114,5 +114,19 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         }
         #endregion
 
+
+        public override bool Equals(object obj)
+        {
+            if (obj is SoundAtom)
+            {
+                SoundAtom sobj = (SoundAtom)obj;
+                if (sobj._phonemeSymbol == this._phonemeSymbol) return true;
+                return false;
+            }
+            else
+            {
+                return base.Equals(obj);
+            }
+        }
     }
 }

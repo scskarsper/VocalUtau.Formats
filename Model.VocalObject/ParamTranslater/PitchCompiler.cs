@@ -91,7 +91,6 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
             long EsTick = LastTick;
             if (NoteEndIndex < partsObject.NoteList.Count - 1)
             {
-//                NoteObject lastObj = partsObject.NoteList[NoteEndIndex];
                 EsTick = GetNoteEnd(NoteEndIndex);
                 LastTick = EsTick - calcTransLength(NoteEndIndex, true);
             }
@@ -155,8 +154,12 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         }
         private void AddTransPart(int preObjIndex, int nxtObjIndex,bool ClearBefore=false)
         {
-            long TStart = GetNoteEnd(preObjIndex) - calcTransLength(preObjIndex, true);
-            long TEnd = GetNoteStart(nxtObjIndex) + calcTransLength(nxtObjIndex, false);
+            long CutDown = 480;//超过这个间隔的不计算
+
+            long PNE = GetNoteEnd(preObjIndex);
+            long TStart = PNE - calcTransLength(preObjIndex, true);
+            long NNS = GetNoteStart(nxtObjIndex);
+            long TEnd = NNS + calcTransLength(nxtObjIndex, false);
             if (TStart < TEnd)
             {
                 if (ClearBefore)
@@ -164,7 +167,21 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     TickSortList<PitchObject> BPL = partsObject.BasePitchList;
                     clearPitchList(ref BPL, TStart, TEnd);
                 }
-                partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                if (Math.Abs(PNE - NNS) > 480)
+                {
+                    List<PitchObject> tmp = new List<PitchObject>();
+                    double p1=GetNotePitchValue(preObjIndex);
+                    double p2 = GetNotePitchValue(nxtObjIndex);
+                    tmp.Add(new PitchObject(TStart, p1));
+                    tmp.Add(new PitchObject(PNE, p1));
+                    tmp.Add(new PitchObject(NNS, p2));
+                    tmp.Add(new PitchObject(TEnd, p2));
+                    partsObject.BasePitchList.AddRange(tmp);
+                }
+                else
+                {
+                    partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                }
             }
             else
             {
@@ -176,7 +193,21 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     TickSortList<PitchObject> BPL = partsObject.BasePitchList;
                     clearPitchList(ref BPL, TStart, TPEnd);
                 }
-                partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                if (Math.Abs(PNE - NNS) > 480)
+                {
+                    List<PitchObject> tmp = new List<PitchObject>();
+                    double p1 = GetNotePitchValue(preObjIndex);
+                    double p2 = GetNotePitchValue(nxtObjIndex);
+                    tmp.Add(new PitchObject(TStart, p1));
+                    tmp.Add(new PitchObject(PNE, p1));
+                    tmp.Add(new PitchObject(NNS, p2));
+                    tmp.Add(new PitchObject(TEnd, p2));
+                    partsObject.BasePitchList.AddRange(tmp);
+                }
+                else
+                {
+                    partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                }
                 for (long i = TEnd+1; i <= TPEnd; i++)
                 {
                     partsObject.BasePitchList.Add(new PitchObject(i, GetNotePitchValue(nxtObjIndex)));

@@ -69,7 +69,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
 
-        double _PreUtterance;
+        double _PreUtterance = double.NaN;
 
         [DataMember]
         public double PreUtterance
@@ -77,7 +77,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _PreUtterance; }
             set { _PreUtterance = value; }
         }
-        double _Overlap;
+        double _Overlap = double.NaN;
 
         [DataMember]
         public double Overlap
@@ -85,7 +85,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _Overlap; }
             set { _Overlap = value; }
         }
-        double _Intensity;
+        double _Intensity = double.NaN;
 
         [DataMember]
         public double Intensity
@@ -93,7 +93,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _Intensity; }
             set { _Intensity = value; }
         }
-        double _Modulation;
+        double _Modulation = double.NaN;
 
         [DataMember]
         public double Modulation
@@ -102,7 +102,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _Modulation = value; }
         }
 
-        double _StartPoint;
+        double _StartPoint = double.NaN;
 
         [DataMember]
         public double StartPoint
@@ -110,7 +110,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             get { return _StartPoint; }
             set { _StartPoint = value; }
         }
-        double _Velocity;
+        double _Velocity = double.NaN;
 
         [DataMember]
         public double Velocity

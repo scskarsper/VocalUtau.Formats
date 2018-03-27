@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using VocalUtau.Formats.Model.Utils;
 
 namespace VocalUtau.Formats.Model.VocalObject
 {
@@ -51,6 +52,15 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _SingerFolder = value; }
         }
 
+        public string getRealSingerFolder()
+        {
+            return PathUtils.AbsolutePath(SingerFolder);
+        }
+        public void setRealSingerFolder(string value)
+        {
+            SingerFolder = PathUtils.RelativePath(value);
+        }
+
         string _PartResampler = "";
 
         [DataMember]
@@ -58,6 +68,15 @@ namespace VocalUtau.Formats.Model.VocalObject
         {
             get { return _PartResampler; }
             set { _PartResampler = value; }
+        }
+
+        public string getRealResamplerPath()
+        {
+            return PathUtils.AbsolutePath(PartResampler);
+        }
+        public void setRealResamplerPath(string value)
+        {
+            PartResampler = PathUtils.RelativePath(value);
         }
 
         string _Flags = "";

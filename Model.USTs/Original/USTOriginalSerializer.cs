@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using VocalUtau.Formats.Model.Utils;
 using VocalUtau.Formats.Model.VocalObject;
 using VocalUtau.Formats.Model.VocalObject.ParamTranslater;
 
@@ -59,7 +60,10 @@ namespace VocalUtau.Formats.Model.USTs.Original
         public static double IniReadDouble(string Section, string Key, double Default, string iniFilename)
         {
             double t = Default;
-            double.TryParse(IniReadValue(Section, Key, Default.ToString(), iniFilename), out t);
+            string RValue=IniReadValue(Section, Key, Default.ToString(), iniFilename);
+            if (RValue.Trim() == "") 
+                return double.NaN;
+            double.TryParse(RValue, out t);
             return t;
         }
         /// <summary>
@@ -86,6 +90,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
         public static USTOriginalProject Deserialize(string ustfile)
         {
             USTOriginalProject Original = new USTOriginalProject();
+            Encoding FileEnc = FileEncodingUtils.GetEncoding(ustfile);
             List<string> sectionList = ReadSections(ustfile);
             for (int i = 0; i < sectionList.Count; i++)
             {
@@ -95,7 +100,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
                 {
                     Original.Tempo = IniReadDouble(sectionName, "Tempo", 120.0, ustfile);
                     Original.Tracks = (int)IniReadDouble(sectionName, "Tracks", 1, ustfile);
-                    Original.ProjectName = IniReadValue(sectionName, "ProjectName", "", ustfile);
+                    Original.ProjectName = FileEncodingUtils.DefaultToEncoding(IniReadValue(sectionName, "ProjectName", "", ustfile), FileEnc);
                     Original.VoiceDir = IniReadValue(sectionName, "VoiceDir", "", ustfile);
                     Original.OutFile = IniReadValue(sectionName, "OutFile", "", ustfile);
                     Original.CacheDir = IniReadValue(sectionName, "CacheDir", "", ustfile);
@@ -109,20 +114,20 @@ namespace VocalUtau.Formats.Model.USTs.Original
                 {
                     USTOriginalNote UNote = new USTOriginalNote();
                     UNote.Length = (long)IniReadDouble(sectionName, "Length", 0, ustfile);
-                    UNote.Lyric = IniReadValue(sectionName, "Lyric", "", ustfile);
+                    UNote.Lyric = FileEncodingUtils.DefaultToEncoding(IniReadValue(sectionName, "Lyric", "", ustfile),FileEnc);
                     UNote.NoteNum = (int)IniReadDouble(sectionName, "NoteNum", 60, ustfile);
-                    UNote.PreUtterance = (int)IniReadDouble(sectionName, "PreUtterance", 0, ustfile);
-                    UNote.Overlap = (int)IniReadDouble(sectionName, "VoiceOverlap", 0, ustfile);
-                    UNote.Intensity = (int)IniReadDouble(sectionName, "Intensity", 0, ustfile);
-                    UNote.Modulation = (int)IniReadDouble(sectionName, "Modulation", 0, ustfile);
-                    UNote.Tempo = (long)IniReadDouble(sectionName, "Tempo", 0, ustfile);
-                    UNote.StartPoint = (int)IniReadDouble(sectionName, "StartPoint", 0, ustfile);
-                    UNote.Velocity = (int)IniReadDouble(sectionName, "Velocity", 0, ustfile);
+                    UNote.PreUtterance = (int)IniReadDouble(sectionName, "PreUtterance", double.NaN, ustfile);
+                    UNote.Overlap = (int)IniReadDouble(sectionName, "VoiceOverlap", double.NaN, ustfile);
+                    UNote.Intensity = (int)IniReadDouble(sectionName, "Intensity", double.NaN, ustfile);
+                    UNote.Modulation = (int)IniReadDouble(sectionName, "Modulation", double.NaN, ustfile);
+                    UNote.Tempo = (long)IniReadDouble(sectionName, "Tempo", double.NaN, ustfile);
+                    UNote.StartPoint = (int)IniReadDouble(sectionName, "StartPoint", double.NaN, ustfile);
+                    UNote.Velocity = (int)IniReadDouble(sectionName, "Velocity", double.NaN, ustfile);
                     UNote.Flags = IniReadValue(sectionName, "Flags", "", ustfile);
-                    UNote.Envelope = IniReadValue(sectionName, "Envelope", "", ustfile); 
-                    UNote.Apreuttr = (int)IniReadDouble(sectionName, "@preuttr", 0, ustfile);
-                    UNote.Aoverlap = (int)IniReadDouble(sectionName, "@overlap", 0, ustfile);
-                    UNote.Astpoint = (int)IniReadDouble(sectionName, "@stpoint", 0, ustfile);
+                    UNote.Envelope = IniReadValue(sectionName, "Envelope", "", ustfile);
+                    UNote.Apreuttr = (int)IniReadDouble(sectionName, "@preuttr", double.NaN, ustfile);
+                    UNote.Aoverlap = (int)IniReadDouble(sectionName, "@overlap", double.NaN, ustfile);
+                    UNote.Astpoint = (int)IniReadDouble(sectionName, "@stpoint", double.NaN, ustfile);
                     UNote.PBType = (int)IniReadDouble(sectionName, "PBType", 5, ustfile);
                     UNote.PitchBend = IniReadValue(sectionName, "PitchBend", "", ustfile);
                     UNote.PBStart = (int)IniReadDouble(sectionName, "PBStart", 0, ustfile);
@@ -136,7 +141,11 @@ namespace VocalUtau.Formats.Model.USTs.Original
             }
             return Original;
         }
-
+        private static double FormatNan(double src)
+        {
+            if (src <= Int32.MinValue) return double.NaN;
+            return src;
+        }
         public static PartsObject UST2Parts(USTOriginalProject ust)
         {
             PartsObject po = new PartsObject(ust.ProjectName);
@@ -154,12 +163,12 @@ namespace VocalUtau.Formats.Model.USTs.Original
                     NoteObject no = new NoteObject(stt, len, ust.Notes[i].NoteNum);
                     no.Lyric = ust.Notes[i].Lyric;
                     no.PhonemeAtoms[0].Flags = ust.Notes[i].Flags;
-                    no.PhonemeAtoms[0].Intensity = ust.Notes[i].Intensity;
-                    no.PhonemeAtoms[0].Modulation = ust.Notes[i].Modulation;
-                    no.PhonemeAtoms[0].Overlap = ust.Notes[i].Overlap;
-                    no.PhonemeAtoms[0].PreUtterance = ust.Notes[i].PreUtterance;
-                    no.PhonemeAtoms[0].StartPoint = ust.Notes[i].StartPoint;
-                    no.PhonemeAtoms[0].Velocity = ust.Notes[i].Velocity;
+                    no.PhonemeAtoms[0].Intensity = FormatNan(ust.Notes[i].Intensity);
+                    no.PhonemeAtoms[0].Modulation = FormatNan(ust.Notes[i].Modulation);
+                    no.PhonemeAtoms[0].Overlap = FormatNan(ust.Notes[i].Overlap);
+                    no.PhonemeAtoms[0].PreUtterance = FormatNan(ust.Notes[i].PreUtterance);
+                    no.PhonemeAtoms[0].StartPoint = FormatNan(ust.Notes[i].StartPoint);
+                    no.PhonemeAtoms[0].Velocity = FormatNan(ust.Notes[i].Velocity);
                     List<KeyValuePair<double,double>> env=ust.Notes[i].EnvelopAnalyse();
                     try
                     {
