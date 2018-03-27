@@ -11,7 +11,7 @@ namespace VocalUtau.Formats.Model.Utils
 
         public class ResamplerArgs
         {
-            public ResamplerArgs(SoundAtom basedAtom,string OutputFilePath, double Tempo, long TickLength, string Note, int Moduration = 0, int Intensity = 100)
+            public ResamplerArgs(SoundAtom basedAtom, string OutputFilePath, double Tempo, long TickLength, string Note, double Moduration = 0, double Intensity = 100)
             {
                 this.Tempo = Tempo;
                 this.TickLength = TickLength;
@@ -66,17 +66,17 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _Flags = value; }
             }
 
-            int _Intensity = 100;
+            double _Intensity = 100;
 
-            public int Intensity
+            public double Intensity
             {
                 get { return _Intensity; }
                 set { _Intensity = value; }
             }
 
-            int _Moduration = 0;
+            double _Moduration = 0;
 
-            public int Moduration
+            public double Moduration
             {
                 get { return _Moduration; }
                 set { _Moduration = value; }
@@ -99,30 +99,30 @@ namespace VocalUtau.Formats.Model.Utils
             }
             
             #region
-            int _SoundStartMs = 0;
+            double _SoundStartMs = 0;
             /// <summary>
             ///发音开始（偏移,Offset）,距离音频时轴0的毫秒数
             /// </summary>
-            public int SoundStartMs
+            public double SoundStartMs
             {
                 get { return _SoundStartMs; }
                 set { _SoundStartMs = value; }
             }
-            int _FixedReleasingLengthMs = 0;
+            double _FixedReleasingLengthMs = 0;
             /// <summary>
             /// 发音结束,距离音频末尾的毫秒数
             /// </summary>
-            public int FixedReleasingLengthMs
+            public double FixedReleasingLengthMs
             {
                 get { return _FixedReleasingLengthMs; }
                 set { _FixedReleasingLengthMs = value; }
             }
 
-            int _FixedConsonantLengthMs = 0;
+            double _FixedConsonantLengthMs = 0;
             /// <summary>
             /// 辅音（子音部），距离发音开始点时轴(SoundStartMs)的毫秒数
             /// </summary>
-            public int FixedConsonantLengthMs
+            public double FixedConsonantLengthMs
             {
                 get { return _FixedConsonantLengthMs; }
                 set { _FixedConsonantLengthMs = value; }
@@ -157,8 +157,8 @@ namespace VocalUtau.Formats.Model.Utils
             }
 
 
-            long PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
-            long FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + PreUttrOverlapsMs));
+            double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
+            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + PreUttrOverlapsMs));
             string[] resampler_arg_suffix = new string[]{
                         "\"" + Args.InputWavfile +"\"",
                         "\"" + Args.OutputFile+"\"",
@@ -273,8 +273,8 @@ namespace VocalUtau.Formats.Model.Utils
         }
         public static string GetWavtoolArgs(WavtoolArgs Args)
         {
-            long PreUttrOverlapsMs=UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
-            long TotalLength = (long)(MidiMathUtils.Tick2Time((long)Args.TickLength, Args.Tempo) * 1000 + PreUttrOverlapsMs);
+            double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
+            long TotalLength = (long)Math.Ceiling(MidiMathUtils.Tick2Time((long)Args.TickLength, Args.Tempo) * 1000 + PreUttrOverlapsMs);
             long EnvStart = Args.FadeInLengthMs;
             long EnvEnd = TotalLength-Args.FadeOutLengthMs;
             SortedDictionary<long,long> TargetEnvlope=new SortedDictionary<long,long>();

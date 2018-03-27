@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using VocalUtau.Formats.Model.Utils;
 
 namespace VocalUtau.Formats.Model.Database.VocalDatabase
 {
+    [Serializable]
+    [DataContract]
     public class SoundAtom
     {
         public SoundAtom()
@@ -16,6 +19,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         /// <summary>
         /// 文件名
         /// </summary>
+        [DataMember]
         public string WavFile
         {
             get { return _wavFile; }
@@ -26,6 +30,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         /// <summary>
         /// 辅助记号
         /// </summary>
+        [DataMember]
         public string PhonemeSymbol
         {
             get { return _phonemeSymbol; }
@@ -35,30 +40,33 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         /// 主要发音属性：<P0>-（SoundStartMs）-<P1>-(FixedConsonantLengthMs)-<P2>-(延长部)-<P3>-(FixedReleasingLengthMs)-<Pn>
         /// </summary>
         #region
-        int _SoundStartMs = 0;
+        double _SoundStartMs = 0;
         /// <summary>
         ///发音开始（偏移,Offset）,距离音频时轴0的毫秒数
         /// </summary>
-        public int SoundStartMs
+        [DataMember]
+        public double SoundStartMs
         {
             get { return _SoundStartMs; }
             set { _SoundStartMs = value; }
         }
-        int _FixedReleasingLengthMs = 0;
+        double _FixedReleasingLengthMs = 0;
         /// <summary>
         /// 发音结束,距离音频末尾的毫秒数
         /// </summary>
-        public int FixedReleasingLengthMs
+        [DataMember]
+        public double FixedReleasingLengthMs
         {
             get { return _FixedReleasingLengthMs; }
             set { _FixedReleasingLengthMs = value; }
         }
 
-        int _FixedConsonantLengthMs = 0;
+        double _FixedConsonantLengthMs = 0;
         /// <summary>
         /// 辅音（子音部），距离发音开始点时轴(SoundStartMs)的毫秒数
         /// </summary>
-        public int FixedConsonantLengthMs
+        [DataMember]
+        public double FixedConsonantLengthMs
         {
             get { return _FixedConsonantLengthMs; }
             set { _FixedConsonantLengthMs = value; }
@@ -66,33 +74,37 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         #endregion
 
         #region
+        [Serializable]
+        [DataContract]
         public class PreUtterOverlapArgs
         {
             public PreUtterOverlapArgs()
             {
 
             }
-            public PreUtterOverlapArgs(int Overlap, int PreUtterance)
+            public PreUtterOverlapArgs(double Overlap, double PreUtterance)
             {
                 this._OverlapMs = OverlapMs;
                 this._PreUtterance = PreUtterance;
             }
-            private int _OverlapMs = 0;
+            private double _OverlapMs = 0;
             /// <summary>
             /// 重叠，与前一个音符重叠部分的长度，（包络的起点）
             /// </summary>
-            public int OverlapMs
+            [DataMember]
+            public double OverlapMs
             {
                 get { return _OverlapMs; }
                 set { _OverlapMs = value; }
             }
 
-            private int _PreUtterance = 0;
+            private double _PreUtterance = 0;
             /// <summary>
             /// 先行发音，整体音符前移长度。
             /// RealOverlap = p.Oto.msPreUtterance + oa_next.msOverlap - oa_next.msPreUtterance;
             /// </summary>
-            public int PreUtterance
+            [DataMember]
+            public double PreUtterance
             {
                 get { return _PreUtterance; }
                 set { _PreUtterance = value; }
@@ -107,10 +119,11 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             }
         }
         PreUtterOverlapArgs _PreutterOverlapsArgs = new PreUtterOverlapArgs();
-
+        [DataMember]
         public PreUtterOverlapArgs PreutterOverlapsArgs
         {
-            get { return _PreutterOverlapsArgs; }
+            get { if (_PreutterOverlapsArgs == null)_PreutterOverlapsArgs = new PreUtterOverlapArgs(); return _PreutterOverlapsArgs; }
+            set { _PreutterOverlapsArgs = value; }
         }
         #endregion
 

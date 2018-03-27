@@ -4,8 +4,7 @@ D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.dll
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.pdb
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\VocalUtau.Formats.dll.config
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\ICSharpCode.SharpZipLib.dll
-D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.csprojResolveAssemblyReference.cache
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\DeepCloner.dll
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\DeepCloner.xml
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\NUniversalCharDet.dll
-D:\VocalUtau\IncludeLib\VocalUtau.Formats\bin\Debug\NUniversalCharDet.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.csprojResolveAssemblyReference.cache

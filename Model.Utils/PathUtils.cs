@@ -9,6 +9,21 @@ namespace VocalUtau.Formats.Model.Utils
     public class PathUtils
     {
         private static string basicpath = "";
+
+        private static string FormatPath(string sPath)
+        {
+            if (File.Exists(sPath))
+            {
+                FileInfo fi = new System.IO.FileInfo(sPath);
+                return fi.FullName;
+            }
+            else if (Directory.Exists(sPath))
+            {
+                DirectoryInfo fi = new System.IO.DirectoryInfo(sPath);
+                return fi.FullName;
+            }
+            return sPath;
+        }
         public static string RelativePath(string relativeTo)
         {
             string bFolder = relativeTo;
@@ -25,7 +40,7 @@ namespace VocalUtau.Formats.Model.Utils
                 relativeTo = fi.FullName;
                 bFolder = fi.FullName;
             }
-            string absolutePath = Directory.GetCurrentDirectory();
+            string absolutePath = AppDomain.CurrentDomain.BaseDirectory;
             if (!bFolder.Contains(absolutePath))
             {
                 return relativeTo;
@@ -86,31 +101,13 @@ namespace VocalUtau.Formats.Model.Utils
 
             return relativePath.ToString();
         }
-
         public static string RelativePath(string baseFolder,string relativeTo)
         {
-            if (File.Exists(relativeTo))
-            {
-                FileInfo fi = new System.IO.FileInfo(relativeTo);
-                relativeTo = fi.FullName;
-            }
-            else if(Directory.Exists(relativeTo))
-            {
-                DirectoryInfo fi = new System.IO.DirectoryInfo(relativeTo);
-                relativeTo = fi.FullName;
-            }
+            relativeTo = FormatPath(relativeTo);
 
             string absolutePath = baseFolder;
-            if (File.Exists(absolutePath))
-            {
-                FileInfo fi = new System.IO.FileInfo(absolutePath);
-                absolutePath = fi.FullName;
-            }
-            else if (Directory.Exists(absolutePath))
-            {
-                DirectoryInfo fi = new System.IO.DirectoryInfo(absolutePath);
-                absolutePath = fi.FullName;
-            }
+
+            absolutePath = FormatPath(absolutePath);
 
 
             if (relativeTo.Length > 3)
@@ -182,7 +179,64 @@ namespace VocalUtau.Formats.Model.Utils
                     }
                 }
             }
-            return Path.GetFullPath(absoluteTo);
+            string curP = Directory.GetCurrentDirectory();
+            string ret = absoluteTo;
+            try
+            {
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                ret = Path.GetFullPath(absoluteTo);
+            }
+            catch { ;}
+            Directory.SetCurrentDirectory(curP);
+            return FormatPath(ret);
+        }
+        public static string AbsolutePath(string baseFolder, string absoluteTo)
+        {
+            if (absoluteTo == "") return "";
+            if (absoluteTo.Length > 3)
+            {
+                char c1 = absoluteTo.ToLower()[0];
+                char c2 = absoluteTo[1];
+                char c3 = absoluteTo[2];
+                if (c2 == ':' && c3 == '\\')
+                {
+                    if (c1 <= 'z' && c1 >= 'a')
+                    {
+                        return absoluteTo;
+                    }
+                }
+            }
+            string curP = Directory.GetCurrentDirectory();
+            string ret = absoluteTo;
+            try
+            {
+                Directory.SetCurrentDirectory(baseFolder);
+                ret = Path.GetFullPath(absoluteTo);
+            }
+            catch { ;}
+            Directory.SetCurrentDirectory(curP);
+            return FormatPath(ret);
+        }
+
+
+        public static List<FileInfo> GetFirstFiles(System.IO.DirectoryInfo dir,string[] patterns,int maxdeep)
+        {
+            List<FileInfo> ret = new List<FileInfo>();
+            foreach (string pattern in patterns)
+            {
+                FileInfo[] file = dir.GetFiles(pattern);
+                foreach (FileInfo fi in file)
+                {
+                    ret.Add(fi);
+                    return ret;
+                }
+            }
+            DirectoryInfo[] dis = dir.GetDirectories();
+            foreach (DirectoryInfo di in dis)
+            {
+                ret.AddRange(GetFirstFiles(di,patterns,maxdeep-1).ToArray());
+            }
+            return ret;
         }
     }
 }

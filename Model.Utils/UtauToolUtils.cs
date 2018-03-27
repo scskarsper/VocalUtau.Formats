@@ -20,7 +20,7 @@ namespace VocalUtau.Formats.Model.Utils
             return Return;
         }
 
-        public static long Global_GenerateGlobalPlusTimeMs(VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs thisAtom,VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs nextAtom)
+        public static double Global_GenerateGlobalPlusTimeMs(VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs thisAtom,VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs nextAtom)
         {
             /*
              连续音符A，B,C
@@ -29,9 +29,9 @@ namespace VocalUtau.Formats.Model.Utils
              WavTool.B.Length= B.Tick@B.Temp + B.PreUtter - C.PreUtter + C.Overlap
              WavTool.C.Length= C.Tick@C.Temp + C.PreUTter
              */
-            long tpu = 0;
-            long npu = 0;
-            long nol = 0;
+            double tpu = 0;
+            double npu = 0;
+            double nol = 0;
             try
             {
                 tpu = thisAtom.PreUtterance;

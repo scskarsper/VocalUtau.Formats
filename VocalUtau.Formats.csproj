@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -60,13 +61,17 @@
     <Compile Include="Model.BaseObject\ProjectCooler.cs" />
     <Compile Include="Model.BaseObject\TickSortList.cs" />
     <Compile Include="Model.Database\VocalDatabase\CharacterAtom.cs" />
-    <Compile Include="Model.Database\VocalDatabase\PrefixAtom.cs" />
+    <Compile Include="Model.Database\VocalDatabase\PrefixmapAtom.cs" />
     <Compile Include="Model.Database\VocalDatabase\SoundAtom.cs" />
+    <Compile Include="Model.Database\VocalDatabase\SplitDictionary.cs" />
     <Compile Include="Model.Database\VocalIndexObject.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalProject.cs" />
+    <Compile Include="Model.USTs\Otos\CharacterSerializer.cs" />
     <Compile Include="Model.USTs\Otos\OtoSerializer.cs" />
+    <Compile Include="Model.USTs\Otos\PrefixMapSerialzier.cs" />
+    <Compile Include="Model.USTs\Otos\PresampSerializer.cs" />
     <Compile Include="Model.Utils\FileEncodingUtils.cs" />
     <Compile Include="Model.Utils\MidiMathUtils.cs" />
     <Compile Include="Model.Utils\ObjectAlloc.cs" />

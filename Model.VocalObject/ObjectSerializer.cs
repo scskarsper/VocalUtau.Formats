@@ -80,7 +80,7 @@ namespace VocalUtau.Formats.Model.VocalObject
                 CryptoStream cs = DesCooler.CreateEncryptStream(pwd, msObj);
                 if (isZip)
                 {
-                    TargetStream = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(cs);
+                    TargetStream = new ICSharpCode.SharpZipLib.BZip2.BZip2OutputStream(cs);
                 }
                 else
                 {
@@ -91,7 +91,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             {
                 if (isZip)
                 {
-                    TargetStream = new ICSharpCode.SharpZipLib.GZip.GZipOutputStream(msObj);
+                    TargetStream = new ICSharpCode.SharpZipLib.BZip2.BZip2OutputStream(msObj);
                 }
                 else
                 {
@@ -107,6 +107,7 @@ namespace VocalUtau.Formats.Model.VocalObject
                 }
             }
             catch { ;}
+            TargetStream.Flush();
             TargetStream.Close();
             msObj.Close();
         }
@@ -214,7 +215,7 @@ namespace VocalUtau.Formats.Model.VocalObject
                 CryptoStream cs = DesCooler.CreateDecryptStream(FileInfo.SavePassword, fs);
                 if (isZip)
                 {
-                    SourceStream = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(cs);
+                    SourceStream = new ICSharpCode.SharpZipLib.BZip2.BZip2InputStream(cs);
                 }
                 else
                 {
@@ -225,7 +226,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             {
                 if (isZip)
                 {
-                    SourceStream = new ICSharpCode.SharpZipLib.GZip.GZipInputStream(fs);
+                    SourceStream = new ICSharpCode.SharpZipLib.BZip2.BZip2InputStream(fs);
                 }
                 else
                 {
@@ -263,7 +264,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         private T Deserialize_JSON(Stream SourceStream)
         {
             T ret = default(T);
-            bool isZip = SourceStream is ICSharpCode.SharpZipLib.GZip.GZipInputStream;
+            bool isZip = SourceStream is ICSharpCode.SharpZipLib.BZip2.BZip2InputStream;
             string toDes = "";
             using (StreamReader sr = new StreamReader(SourceStream))
             {
@@ -289,7 +290,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         private T Deserialize_Binary(Stream SourceStream)
         {
             T ret = default(T);
-            bool isZip = SourceStream is ICSharpCode.SharpZipLib.GZip.GZipInputStream;
+            bool isZip = SourceStream is ICSharpCode.SharpZipLib.BZip2.BZip2InputStream;
 
             try
             {
@@ -300,7 +301,7 @@ namespace VocalUtau.Formats.Model.VocalObject
                     return (T)ob;
                 }
             }
-            catch (ICSharpCode.SharpZipLib.GZip.GZipException e) { throw new Exception("Password Error or File Broken"); return default(T); }
+            catch (ICSharpCode.SharpZipLib.BZip2.BZip2Exception e) { throw new Exception("Password Error or File Broken"); return default(T); }
 
             return ret;
         }

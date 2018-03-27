@@ -88,24 +88,16 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _Flags = value; }
         }
 
-        VocalUtau.Formats.Model.Database.VocalDatabase.CharacterAtom charatom =null;
         string _Avatar = "";
 
         [DataMember]
         public string Avatar
         {
-          get { 
-          if (System.IO.File.Exists(_Avatar)) return _Avatar;
-          if (System.IO.File.Exists(_SingerFolder + "\\" + _Avatar)) return (new System.IO.FileInfo(_SingerFolder + "\\" + _Avatar)).FullName;
-          if (System.IO.File.Exists(_SingerFolder + "\\character.txt"))
-          {
-              if (charatom == null) charatom = new Database.VocalDatabase.CharacterAtom();
-              if(!charatom.IsLoaded)charatom.ReadAvatarFromText(_SingerFolder + "\\character.txt");
-              return charatom.Avatar;
-          }
-          return "";
-               }
-          set { _Avatar = value; }
+            get
+            {
+                return _Avatar;
+            }
+            set { _Avatar = value; }
         }
 
         public override bool Equals(object obj)
@@ -122,6 +114,14 @@ namespace VocalUtau.Formats.Model.VocalObject
             {
                 return base.Equals(obj);
             }
+        }
+
+        bool _isSystemSinger = false;
+        [IgnoreDataMember]
+        public bool IsSystemSinger
+        {
+            get { return _isSystemSinger; }
+            set { _isSystemSinger = value; }
         }
 
         public object Clone()
