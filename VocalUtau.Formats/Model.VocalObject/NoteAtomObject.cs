@@ -23,7 +23,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
         long _AtomLength = 0;
-
+        [DataMember]
         public long AtomLength
         {
             get { return _AtomLength; }
@@ -31,7 +31,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
         bool _LengthIsPercent = false;
-
+        [DataMember]
         public bool LengthIsPercent
         {
             get { return _LengthIsPercent; }

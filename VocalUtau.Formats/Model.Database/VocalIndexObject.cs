@@ -165,9 +165,9 @@ namespace VocalUtau.Formats.Model.Database
                 ret.HashFiles.Add("character.txt");
                 ret.CharacertData = CharacterSerializer.DeSerialize(Folder + "\\character.txt");
                 ret.SndAtomList = OtoSerializer.DeSerialize(Folder, ret.HashFiles);
+                ret.HashFiles.Add("prefix.map");
                 if (System.IO.File.Exists(Folder + "\\prefix.map"))
                 {
-                    ret.HashFiles.Add("prefix.map");
                     ret.PrefixAtomList = PrefixMapSerialzier.DeSerialize(Folder + "\\prefix.map");
                 }
                 SplitDictionary sdlib = null;
@@ -181,7 +181,7 @@ namespace VocalUtau.Formats.Model.Database
                 }
                 if (sdlib == null && System.IO.File.Exists(Folder + "\\presamp.ini"))
                 {
-                    sdlib = PresampSerializer.DeSerialize(Folder + "\\presamp.ini");
+                    sdlib = Presamp2DictSerializer.DeSerialize(Folder + "\\presamp.ini");
                     if (sdlib != null)
                     {
                         ret.HashFiles.Add("presamp.ini");

@@ -17,6 +17,14 @@ namespace VocalUtau.Formats.Model.Utils
             fs.Close();
             return enc;
         }
+        public static Encoding GetEncodingJIS(string File)
+        {
+            Encoding enc = Encoding.Default;
+            System.IO.FileStream fs = new System.IO.FileStream(File, System.IO.FileMode.Open);
+            enc = GetEncodingJIS(fs);
+            fs.Close();
+            return enc;
+        }
         public static Encoding GetEncoding(Stream DataStream)
         {
             string EncStr = "default";
@@ -38,6 +46,12 @@ namespace VocalUtau.Formats.Model.Utils
                 default: try { return Encoding.GetEncoding(EncStr); }
                     catch { return Encoding.Default; }
             }
+        }
+        public static Encoding GetEncodingJIS(Stream DataStream)
+        {
+            Encoding Result = GetEncoding(DataStream);
+            if (Result == Encoding.UTF8) return Encoding.UTF8;
+            return Encoding.GetEncoding("Shift-JIS");
         }
 
         public static string DefaultToEncoding(string String,Encoding Encoding)

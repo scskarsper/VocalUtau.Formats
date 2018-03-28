@@ -90,7 +90,7 @@ namespace VocalUtau.Formats.Model.USTs.Original
         public static USTOriginalProject Deserialize(string ustfile)
         {
             USTOriginalProject Original = new USTOriginalProject();
-            Encoding FileEnc = FileEncodingUtils.GetEncoding(ustfile);
+            Encoding FileEnc = FileEncodingUtils.GetEncodingJIS(ustfile);
             List<string> sectionList = ReadSections(ustfile);
             for (int i = 0; i < sectionList.Count; i++)
             {

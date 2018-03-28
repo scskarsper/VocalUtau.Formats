@@ -14,7 +14,7 @@ namespace VocalUtau.Formats.Model.USTs.Otos
             CharacterAtom ret = new CharacterAtom();
             if (System.IO.File.Exists(FilePath))
             {
-                Encoding FileEnc = FileEncodingUtils.GetEncoding(FilePath);
+                Encoding FileEnc = FileEncodingUtils.GetEncodingJIS(FilePath);
                 string[] Datas = System.IO.File.ReadAllLines(FilePath, FileEnc);
                 for (int i = 0; i < Datas.Length; i++)
                 {

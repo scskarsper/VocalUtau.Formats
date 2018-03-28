@@ -14,7 +14,7 @@ namespace VocalUtau.Formats.Model.USTs.Otos
         {
             PrefixmapAtom pfa = new PrefixmapAtom();
             if (!System.IO.File.Exists(FilePath)) return pfa;
-            Encoding FileEnc = FileEncodingUtils.GetEncoding(FilePath);
+            Encoding FileEnc = FileEncodingUtils.GetEncodingJIS(FilePath);
             string[] Datas = System.IO.File.ReadAllLines(FilePath, FileEnc);
             for (int i = 0; i < Datas.Length; i++)
             {
@@ -23,8 +23,14 @@ namespace VocalUtau.Formats.Model.USTs.Otos
                 string pref = pfl[1];
                 string sfx = pfl[2];
                 uint NoteNum = getNoteNumber(NoteS);
-                if (!pfa.PrefixList.Contains(pref)) pfa.PrefixList.Add(pref);
-                if (!pfa.SuffixList.Contains(sfx)) pfa.SuffixList.Add(sfx);
+                if (!pfa.PrefixList.Contains(pref))
+                {
+                    pfa.PrefixList.Add(pref);
+                }
+                if (!pfa.SuffixList.Contains(sfx))
+                {
+                    pfa.SuffixList.Add(sfx);
+                }
                 if (pfa.PreFix.ContainsKey(NoteNum))
                 {
                     pfa.PreFix[NoteNum] = pref;

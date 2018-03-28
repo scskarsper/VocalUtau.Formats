@@ -113,6 +113,14 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
 
+        bool _LockPhoneme = false;
+
+        public bool LockPhoneme
+        {
+            get { return _LockPhoneme; }
+            set { _LockPhoneme = value; }
+        }
+
         List<NoteAtomObject> _PhonemeAtoms = new List<NoteAtomObject>() { new NoteAtomObject() };
 
         [DataMember]

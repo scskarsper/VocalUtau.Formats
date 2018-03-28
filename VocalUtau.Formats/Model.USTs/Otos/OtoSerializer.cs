@@ -15,7 +15,7 @@ namespace VocalUtau.Formats.Model.USTs.Otos
         private static List<SoundAtom> getOto(FileInfo fi, System.IO.DirectoryInfo basedir)
         {
             List<SoundAtom> sa = new List<SoundAtom>();
-            Encoding FileEnc=FileEncodingUtils.GetEncoding(fi.FullName);
+            Encoding FileEnc=FileEncodingUtils.GetEncodingJIS(fi.FullName);
             using(System.IO.FileStream fs=new FileStream(fi.FullName,FileMode.Open))
             {
                 using (StreamReader sr = new StreamReader(fs, FileEnc))

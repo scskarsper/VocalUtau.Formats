@@ -1,0 +1,7 @@
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\bin\Debug\Debuger.exe
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\bin\Debug\Debuger.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\bin\Debug\VocalUtau.Formats.dll
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\bin\Debug\VocalUtau.Formats.pdb
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\obj\Debug\Debuger.csprojResolveAssemblyReference.cache
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\obj\Debug\Debuger.exe
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\Debug.Demo\Debuger\obj\Debug\Debuger.pdb
