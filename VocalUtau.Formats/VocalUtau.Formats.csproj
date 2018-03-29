@@ -65,7 +65,6 @@
     <Compile Include="Model.Database\VocalDatabase\PrefixmapAtom.cs" />
     <Compile Include="Model.Database\VocalDatabase\SoundAtom.cs" />
     <Compile Include="Model.Database\VocalDatabase\SplitDictionary.cs" />
-    <Compile Include="Model.Database\VocalDatabase\SplitDictionary_old.cs" />
     <Compile Include="Model.Database\VocalIndexObject.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalNote.cs" />
     <Compile Include="Model.USTs\Original\USTOriginalSerializer.cs" />

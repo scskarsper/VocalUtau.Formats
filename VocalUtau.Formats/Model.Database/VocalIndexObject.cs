@@ -16,6 +16,14 @@ namespace VocalUtau.Formats.Model.Database
     [DataContract]
     public class VocalIndexObject
     {
+        private string _GUID = "";
+        [DataMember]
+        public string GUID
+        {
+            get { if (_GUID == "")_GUID = Guid.NewGuid().ToString(); return _GUID; }
+            set { if (value != "" )_GUID = value; }
+        }
+
         private BasicFileInformation _BasicData = new BasicFileInformation();
         [DataMember]
         public BasicFileInformation BasicData
@@ -36,7 +44,7 @@ namespace VocalUtau.Formats.Model.Database
         [DataMember]
         public SplitDictionary SplitDictionary
         {
-            get { return _SplitDictionary; }
+            get { if (_SplitDictionary == null)_SplitDictionary = new SplitDictionary(); return _SplitDictionary; }
             set { _SplitDictionary = value; }
         }
 

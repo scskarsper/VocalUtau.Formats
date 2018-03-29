@@ -293,6 +293,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
         public void SetupCurrentPhonmem(NoteObject prevObject, NoteObject curObject, NoteObject nextObject)
         {
+            if (curObject == null) return;
             if (curObject.LockPhoneme) return;
             string prevLyric = "{R}";
             string nextLyric = "{R}";
@@ -328,11 +329,16 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                     curObject.PhonemeAtoms.Clear();
                     for (int i = 0; i < SList.Count; i++)
                     {
-                        NoteAtomObject nao = new NoteAtomObject();
-                        nao.AtomLength = SList[i].AtomLength;
-                        nao.LengthIsPercent = SList[i].LengthIsPercent;
-                        nao.PhonemeAtom = SList[i].PhonemeAtom;
-                        curObject.PhonemeAtoms.Add(nao);
+                        string lastPn = "";
+                        if (curObject.PhonemeAtoms.Count > 0) lastPn = curObject.PhonemeAtoms[curObject.PhonemeAtoms.Count - 1].PhonemeAtom;
+                        if (lastPn != SList[i].PhonemeAtom)
+                        {
+                            NoteAtomObject nao = new NoteAtomObject();
+                            nao.AtomLength = SList[i].AtomLength;
+                            nao.LengthIsPercent = SList[i].LengthIsPercent;
+                            nao.PhonemeAtom = SList[i].PhonemeAtom;
+                            curObject.PhonemeAtoms.Add(nao);
+                        }
                     }
                 }
             }
@@ -341,11 +347,16 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                 curObject.PhonemeAtoms.Clear();
                 for (int i = 0; i < SList.Count; i++)
                 {
-                    NoteAtomObject nao = new NoteAtomObject();
-                    nao.AtomLength = SList[i].AtomLength;
-                    nao.LengthIsPercent = SList[i].LengthIsPercent;
-                    nao.PhonemeAtom = SList[i].PhonemeAtom;
-                    curObject.PhonemeAtoms.Add(nao);
+                    string lastPn = "";
+                    if (curObject.PhonemeAtoms.Count > 0) lastPn = curObject.PhonemeAtoms[curObject.PhonemeAtoms.Count - 1].PhonemeAtom;
+                    if (lastPn != SList[i].PhonemeAtom)
+                    {
+                        NoteAtomObject nao = new NoteAtomObject();
+                        nao.AtomLength = SList[i].AtomLength;
+                        nao.LengthIsPercent = SList[i].LengthIsPercent;
+                        nao.PhonemeAtom = SList[i].PhonemeAtom;
+                        curObject.PhonemeAtoms.Add(nao);
+                    }
                 }
             }
         }
@@ -353,12 +364,17 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         public void UpdateLyrics(ref PartsObject parts, NoteObject curObj)
         {
             int curIndex = parts.NoteList.IndexOf(curObj);
-            NoteObject[] NoteMap=new NoteObject[]{null,null,null,null,null};
+            UpdateLyrics(ref parts, curIndex);
+        }
+        public void UpdateLyrics(ref PartsObject parts, int NoteIndex)
+        {
+            int curIndex = NoteIndex;
+            NoteObject[] NoteMap = new NoteObject[] { null, null, null, null, null };
 
             NoteMap[0] = curIndex - 2 >= 0 ? parts.NoteList[curIndex - 2] : null;
             NoteMap[1] = curIndex - 1 >= 0 ? parts.NoteList[curIndex - 1] : null;
             NoteMap[2] = parts.NoteList[curIndex];
-            NoteMap[3] = curIndex + 1 < parts.NoteList.Count ? parts.NoteList[curIndex + 1]:null;
+            NoteMap[3] = curIndex + 1 < parts.NoteList.Count ? parts.NoteList[curIndex + 1] : null;
             NoteMap[4] = curIndex + 2 < parts.NoteList.Count ? parts.NoteList[curIndex + 2] : null;
             // p2 p1 cur
             // p1 cur n1
@@ -370,23 +386,51 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
         public void UpdateLyrics(ref PartsObject parts, int StartNoteIndex,int EndNoteIndex)
         {
+            if (EndNoteIndex < 0) EndNoteIndex = parts.NoteList.Count - 1;
+            if (StartNoteIndex < 0) StartNoteIndex = 0;
+            if (EndNoteIndex > parts.NoteList.Count - 1) EndNoteIndex = parts.NoteList.Count - 1;
+            if (StartNoteIndex == EndNoteIndex)
+            {
+                UpdateLyrics(ref parts, StartNoteIndex);
+                return;
+            }
+
             Dictionary<int, NoteObject> NoteMap = new Dictionary<int, NoteObject>();
             NoteMap.Add(StartNoteIndex - 2, StartNoteIndex - 2 >= 0 ? parts.NoteList[StartNoteIndex - 2] : null);
             NoteMap.Add(StartNoteIndex - 1, StartNoteIndex - 1 >= 0 ? parts.NoteList[StartNoteIndex - 1] : null);
             NoteMap.Add(EndNoteIndex + 2, EndNoteIndex + 2 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 2] : null);
             NoteMap.Add(EndNoteIndex + 1, EndNoteIndex + 1 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 1] : null);
+            int cnt = 0;
             for (int i = StartNoteIndex; i <= EndNoteIndex; i++)
             {
-                if(!NoteMap.ContainsKey(i))
-                NoteMap.Add(i, parts.NoteList[i]);
+                if (!NoteMap.ContainsKey(i))
+                {
+                    if (i < parts.NoteList.Count) { NoteMap.Add(i, parts.NoteList[i]); cnt++; }
+                }
             }
-            for (int i = 1; i < NoteMap.Count - 1; i++)
+            for (int i = StartNoteIndex; i < EndNoteIndex; i++)
             {
                 SetupCurrentPhonmem(NoteMap[i - 1], NoteMap[i], NoteMap[i + 1]);
             }
         }
+
+        public void UpdateLyrics_Aysnc(AsyncWorkCallbackHandler CallBack, ref PartsObject parts, int NoteStartIndex = 0, int NoteEndIndex = -1)
+        {
+            PartsObject tParts = parts;
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                UpdateLyrics(ref tParts, NoteStartIndex, NoteEndIndex);
+                if (CallBack != null) CallBack(tParts,NoteStartIndex, NoteEndIndex);
+            });
+        }
+        public delegate void AsyncWorkCallbackHandler(PartsObject parts,int NoteStartIndex, int NoteEndIndex);
+
         public void UpdateOutboundsLyric(ref PartsObject parts, int StartNoteIndex, int EndNoteIndex)
         {
+            if (EndNoteIndex < 0) EndNoteIndex = parts.NoteList.Count - 1;
+            if (StartNoteIndex < 0) StartNoteIndex = 0;
+            if (EndNoteIndex > parts.NoteList.Count - 1) EndNoteIndex = parts.NoteList.Count - 1;
+
             NoteObject[] NoteMap = new NoteObject[] { null, null, null, null, null,null };
 
             NoteMap[0] = StartNoteIndex - 2 >= 0 ? parts.NoteList[StartNoteIndex - 2] : null;
@@ -400,6 +444,15 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
             if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2]);
             if (NoteMap[4] != null) SetupCurrentPhonmem(NoteMap[3], NoteMap[4], NoteMap[5]);
+        }
+        public void UpdateOutboundsLyric_Aysnc(AsyncWorkCallbackHandler CallBack, ref PartsObject parts, int NoteStartIndex = 0, int NoteEndIndex = -1)
+        {
+            PartsObject tParts = parts;
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                UpdateLyrics(ref tParts, NoteStartIndex, NoteEndIndex);
+                if (CallBack != null) CallBack(tParts, NoteStartIndex, NoteEndIndex);
+            });
         }
         /*
         

@@ -7,12 +7,6 @@ namespace VocalUtau.Formats.Model.Utils
 {
     public class MidiMathUtils
     {
-        public static long GetNormalizeTick(long Tick)
-        {
-            int Step = 5;
-            long sTick = ((long)Tick / Step) * Step;
-            return sTick;
-        }
         public static double Tick2Time(long Tick, double Tempo)
         {
             double TickPerSecond = 8 * Tempo;

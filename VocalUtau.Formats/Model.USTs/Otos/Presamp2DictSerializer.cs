@@ -67,7 +67,7 @@ namespace VocalUtau.Formats.Model.USTs.Otos
                             }
                             else
                             {
-                                List<string> lt = new List<string>() { so, "", Si1 };
+                                List<string> lt = new List<string>() { so, Si1, Si1 };
                                 Dict.NoteAtomMap.Add(so, lt);
                             }
                         }

@@ -9,7 +9,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 {
     [Serializable]
     [DataContract]
-    public class SoundAtom
+    public class SoundAtom:ICloneable
     {
         public SoundAtom()
         {
@@ -128,6 +128,10 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         #endregion
 
 
+        public object Clone()
+        {
+            return Force.DeepCloner.DeepClonerExtensions.DeepClone<SoundAtom>(this);
+        }
         public override bool Equals(object obj)
         {
             if (obj is SoundAtom)
