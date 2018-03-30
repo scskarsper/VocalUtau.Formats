@@ -97,6 +97,17 @@ namespace VocalUtau.Formats.Model.Utils
                 get { return _PitchValues; }
                 set { _PitchValues = value; }
             }
+
+            string pitchString = "";
+
+            public string PitchString
+            {
+                get { if (pitchString == "" && _PitchValues.Count > 0) {
+                    pitchString = PitchEncoderUtils.Encode(_PitchValues);
+                }; return pitchString;
+                }
+                set { pitchString = value; }
+            }
             
             #region
             double _SoundStartMs = 0;
@@ -146,15 +157,21 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _nextPreutterOverlapsArgs = value; }
             }
         }
-        public static string GetResamplerArg(ResamplerArgs Args)
+
+        public static string GetResamplerArgStr(ResamplerArgs Args)
         {
+            return String.Join(" ", GetResamplerArg(Args));
+        }
+        public static string[] GetResamplerArg(ResamplerArgs Args)
+        {
+            /*
             int PointCount = (int)Math.Ceiling((double)Args.TickLength / 5.0);
             List<int> PointVs = new List<int>();
             PointVs.AddRange(Args.PitchValues.ToArray());
             for (int i = PointVs.Count == 0 ? 0 : PointVs.Count - 1; i < PointCount; i++)
             {
                 PointVs.Add(0);
-            }
+            }*/
 
 
             double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
@@ -172,8 +189,8 @@ namespace VocalUtau.Formats.Model.Utils
                         Args.Intensity.ToString() + "",
                         Args.Moduration.ToString() + "",
                         "!"+Args.Tempo.ToString()+ "" ,
-                        PitchEncoderUtils.Encode(PointVs)};
-            return String.Join(" ", resampler_arg_suffix);
+                        Args.PitchString};
+            return resampler_arg_suffix;
         }
 
         public class WavtoolArgs
@@ -271,61 +288,79 @@ namespace VocalUtau.Formats.Model.Utils
             }
 
         }
-        public static string GetWavtoolArgs(WavtoolArgs Args)
+        public static string GetWavtoolArgsStr(WavtoolArgs Args)
+        {
+            return String.Join(" ", GetWavtoolArgs(Args));
+        }
+        public static string[] GetWavtoolArgs(WavtoolArgs Args)
         {
             double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
             long TotalLength = (long)Math.Ceiling(MidiMathUtils.Tick2Time((long)Args.TickLength, Args.Tempo) * 1000 + PreUttrOverlapsMs);
             long EnvStart = Args.FadeInLengthMs;
             long EnvEnd = TotalLength-Args.FadeOutLengthMs;
             SortedDictionary<long,long> TargetEnvlope=new SortedDictionary<long,long>();
-            TargetEnvlope.Add(0, 0);
-            TargetEnvlope.Add(TotalLength,0);
-            long LastVol=100;
             double vpcp = (double)Args.VolumePercentInt / 100.0;
-            foreach (KeyValuePair<long, long> sortEnv in Args.EnvlopePoints)
+            if (TotalLength == 0)
             {
-                if (sortEnv.Key == EnvStart)
+                TargetEnvlope.Add(Args.FadeInLengthMs,100);
+                TargetEnvlope.Add(TotalLength - Args.FadeOutLengthMs, 100);
+            }
+            else
+            {
+                TargetEnvlope.Add(0, 0);
+                TargetEnvlope.Add(TotalLength, 0);
+                long LastVol = 100;
+                foreach (KeyValuePair<long, long> sortEnv in Args.EnvlopePoints)
                 {
-                    TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
-                }
-                else if (sortEnv.Key > EnvStart && sortEnv.Key <= EnvEnd)
-                {
-                    if (!TargetEnvlope.ContainsKey(EnvStart))
+                    if (sortEnv.Key == EnvStart)
                     {
-                        TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
+                        if (!TargetEnvlope.ContainsKey(sortEnv.Key)) TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
                     }
-                    TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
+                    else if (sortEnv.Key > EnvStart && sortEnv.Key <= EnvEnd)
+                    {
+                        if (!TargetEnvlope.ContainsKey(EnvStart))
+                        {
+                            TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
+                        }
+                        if(!TargetEnvlope.ContainsKey(sortEnv.Key)) TargetEnvlope.Add(sortEnv.Key, (long)(sortEnv.Value * vpcp));
+                    }
+                    else if (sortEnv.Key > EnvEnd)
+                    {
+                        break;
+                    }
+                    LastVol = sortEnv.Value;
                 }
-                else if (sortEnv.Key > EnvEnd)
+                if (!TargetEnvlope.ContainsKey(EnvStart))
                 {
-                    break;
+                    if (Args.EnvlopePoints.Count == 0 || TargetEnvlope.Count == 0)
+                    {
+                        if (!TargetEnvlope.ContainsKey(EnvStart)) TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
+                    }
+                    else
+                    {
+                        if (!TargetEnvlope.ContainsKey(EnvStart)) TargetEnvlope.Add(EnvStart, TargetEnvlope[TargetEnvlope.Keys.ToArray()[0]]);
+                    }
                 }
-                LastVol = sortEnv.Value;
-            }
-            if (!TargetEnvlope.ContainsKey(EnvStart))
-            {
-                if (Args.EnvlopePoints.Count == 0 || TargetEnvlope.Count==0)
+                if (!TargetEnvlope.ContainsKey(EnvEnd))
                 {
-                    TargetEnvlope.Add(EnvStart, (long)(LastVol * vpcp));
-                }
-                else
-                {
-                    TargetEnvlope.Add(EnvStart, TargetEnvlope[TargetEnvlope.Keys.ToArray()[0]]);
+                    if (!TargetEnvlope.ContainsKey(EnvEnd)) TargetEnvlope.Add(EnvEnd, (long)(LastVol * vpcp));
                 }
             }
-            if (!TargetEnvlope.ContainsKey(EnvEnd))
-            {
-                TargetEnvlope.Add(EnvEnd, (long)(LastVol * vpcp));
-            }
+            string P2=Args.FadeInLengthMs.ToString();
+            string P3=Args.FadeOutLengthMs.ToString();
+            string V2=TargetEnvlope[Args.FadeInLengthMs].ToString();
+            string V3=TargetEnvlope[TotalLength - Args.FadeOutLengthMs].ToString();
             List<string> wavtool_arg_suffix = new List<string>{
-                        "\"" + Args.InputWavfile+"\"",
-                        "\"" + Args.OutputWavfile+"\"",
+                        "\"" + Args.OutputWavfile +"\"",
+                        "\"" + Args.InputWavfile +"\"",
                         "" + Args.StartPointMs.ToString() + "",
                         "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Abs(PreUttrOverlapsMs).ToString(),
                         //P1,P2,P3
-                        "0",Args.FadeInLengthMs.ToString(),Args.FadeOutLengthMs.ToString(),
+                        "0",
+                        P2,
+                        P3,
                         //V1,V2,V3,V4
-                        "0",TargetEnvlope[Args.FadeInLengthMs].ToString(),TargetEnvlope[TotalLength - Args.FadeOutLengthMs].ToString(),"0",
+                        "0",V2,V3,"0",
                         Args.ThisPreutterOverlapsArgs.OverlapMs.ToString(),
                         //P4
                         "0"
@@ -344,7 +379,8 @@ namespace VocalUtau.Formats.Model.Utils
                 wavtool_arg_suffix.Add(dert.ToString());
                 wavtool_arg_suffix.Add(((long)(sortEnv.Value * vpcp)).ToString());
             }
-            return String.Join(" ", wavtool_arg_suffix);
+
+            return wavtool_arg_suffix.ToArray();
         }
     }
 }

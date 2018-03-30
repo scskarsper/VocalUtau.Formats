@@ -19,20 +19,27 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         {
             DynCache.Clear();
         }
+        Object threadLocker = new Object();
         public double getDynValue(long tick)
         {
             if (this.partsObject.DynList.Count == 0)
             {
                 this.partsObject.DynList.Add(new ControlObject(0, 0));
             }
-            if (DynCache.ContainsKey(tick))
+            lock (threadLocker)
             {
-                return DynCache[tick];
+                if (DynCache.ContainsKey(tick))
+                {
+                    return DynCache[tick];
+                }
             }
             long newTick = this.partsObject.DynList.FindNearestTick(tick);
             if (newTick != -1)
             {
-                DynCache.Add(tick, this.partsObject.DynList.getData(newTick).Value);
+                lock (threadLocker)
+                {
+                    DynCache.Add(tick, this.partsObject.DynList.getData(newTick).Value);
+                }
                 return this.partsObject.DynList.getData(newTick).Value;
             }
             else

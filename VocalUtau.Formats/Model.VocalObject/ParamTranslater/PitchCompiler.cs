@@ -281,9 +281,15 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 return NxtLen;
             }
         }
+        Object ReaderthreadLocker = new object();
         public double getRealPitch(long tick)
         {
-            return getBasePitch(tick) + getPitch(tick);
+            double ret = 0;
+            lock (ReaderthreadLocker)
+            {
+                ret=getBasePitch(tick) + getPitch(tick);
+            }
+            return ret;
         }
         public double getBasePitch(long tick)
         {
@@ -310,6 +316,7 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 return 0;
             }
         }
+        Object threadLocker=new Object();
         public double getPitch(long tick)
         {
             if (this.partsObject.PitchList.Count == 0)
@@ -323,7 +330,10 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
             long newTick = this.partsObject.PitchList.FindNearestTick(tick);
             if (newTick != -1)
             {
-                PitchCache.Add(tick, this.partsObject.PitchList.getData(newTick).PitchValue.PitchValue);
+                lock (threadLocker)
+                {
+                    PitchCache.Add(tick, this.partsObject.PitchList.getData(newTick).PitchValue.PitchValue);
+                }
                 return this.partsObject.PitchList.getData(newTick).PitchValue.PitchValue;
             }
             else
