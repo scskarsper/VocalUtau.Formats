@@ -164,16 +164,6 @@ namespace VocalUtau.Formats.Model.Utils
         }
         public static string[] GetResamplerArg(ResamplerArgs Args)
         {
-            /*
-            int PointCount = (int)Math.Ceiling((double)Args.TickLength / 5.0);
-            List<int> PointVs = new List<int>();
-            PointVs.AddRange(Args.PitchValues.ToArray());
-            for (int i = PointVs.Count == 0 ? 0 : PointVs.Count - 1; i < PointCount; i++)
-            {
-                PointVs.Add(0);
-            }*/
-
-
             double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
             double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + PreUttrOverlapsMs));
             string[] resampler_arg_suffix = new string[]{
@@ -211,9 +201,9 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _inputWavfile = value; }
             }
 
-            long _startPoint = 0;
+            double _startPoint = 0;
 
-            public long StartPointMs
+            public double StartPointMs
             {
                 get { return _startPoint; }
                 set { _startPoint = value; }
@@ -292,8 +282,34 @@ namespace VocalUtau.Formats.Model.Utils
         {
             return String.Join(" ", GetWavtoolArgs(Args));
         }
+        private static string[] GetWavtoolArgs_SleepR(WavtoolArgs Args)
+        {
+            double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
+            List<string> wavtool_arg_suffix = new List<string>
+            {
+                "\"" + Args.OutputWavfile +"\"",
+                "\"R.wav\"",
+                "0",
+                "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Abs(PreUttrOverlapsMs).ToString(),
+                        //P1,P2,P3
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "0"
+            };
+            return wavtool_arg_suffix.ToArray();
+        }
         public static string[] GetWavtoolArgs(WavtoolArgs Args)
         {
+            if (Args.InputWavfile == "{R}")
+            {
+                return GetWavtoolArgs_SleepR(Args);
+            }
             double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
             long TotalLength = (long)Math.Ceiling(MidiMathUtils.Tick2Time((long)Args.TickLength, Args.Tempo) * 1000 + PreUttrOverlapsMs);
             long EnvStart = Args.FadeInLengthMs;
@@ -348,8 +364,8 @@ namespace VocalUtau.Formats.Model.Utils
             }
             string P2=Args.FadeInLengthMs.ToString();
             string P3=Args.FadeOutLengthMs.ToString();
-            string V2=TargetEnvlope[Args.FadeInLengthMs].ToString();
-            string V3=TargetEnvlope[TotalLength - Args.FadeOutLengthMs].ToString();
+            string V2=(TargetEnvlope[Args.FadeInLengthMs]*vpcp).ToString();
+            string V3=(TargetEnvlope[TotalLength - Args.FadeOutLengthMs]*vpcp).ToString();
             List<string> wavtool_arg_suffix = new List<string>{
                         "\"" + Args.OutputWavfile +"\"",
                         "\"" + Args.InputWavfile +"\"",

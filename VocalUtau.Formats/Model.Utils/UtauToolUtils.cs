@@ -29,6 +29,7 @@ namespace VocalUtau.Formats.Model.Utils
              WavTool.B.Length= B.Tick@B.Temp + B.PreUtter - C.PreUtter + C.Overlap
              WavTool.C.Length= C.Tick@C.Temp + C.PreUTter
              */
+            //以上参数以 @stpoint@preuttr等优先默认
             double tpu = 0;
             double npu = 0;
             double nol = 0;

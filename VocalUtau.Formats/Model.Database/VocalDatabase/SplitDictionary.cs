@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using VocalUtau.Formats.Model.Utils;
 using VocalUtau.Formats.Model.VocalObject;
 
 namespace VocalUtau.Formats.Model.Database.VocalDatabase
@@ -79,10 +80,11 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
         /// 当音符索引为0时，取整个音素
         /// 音符Atom之间使用|分割
         /// 音符Atom公式末尾加入$代表指定Atom固定长度，值可以为整形和百分数（??%)
+        /// 固定长度值,考虑到BPM变化这个数值是根据Tempo=120时候设置的，其他曲速的时候会根据这个值自动获取正确的长度
         /// 举例：CurrentNote[]|CurrentNote[n] NextNote[1]$120
         /// 举例：CurrentNote[]|CurrentNote[n] NextNote[1]$5%
         /// </summary>
-        string _FunctionString = "CurrentNote[]|CurrentNote[n] NextNote[1]$120";
+        string _FunctionString = "CurrentNote[]$240|CurrentNote[n] NextNote[1]";
         //(PrevNote|CurrentNote|NextNote)\[[0-9,n,-]{0,255}\]
         [DataMember]
         public string FunctionString
@@ -170,7 +172,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                 return "";
             }
         }
-        public List<SplitAtom> GetCurrentNoteAtom(string prev, string current, string next)
+        public List<SplitAtom> GetCurrentNoteAtom(string prev, string current, string next, double BaseTempo)
         {
             List<string> GetCurrent = GetAtomItem(current);
             if (GetCurrent.Count == 0)
@@ -200,9 +202,14 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                     SplitAtom sa = new SplitAtom();
                     sa.PhonemeAtom = AtomStr;
                     sa.AtomLength=(long)Microsoft.VisualBasic.Conversion.Val(AtomLength);
-                    if(AtomLength.IndexOf('%')!=-1)
+                    if (AtomLength.IndexOf('%') != -1)
                     {
                         sa.LengthIsPercent = true;
+                    }
+                    else if(BaseTempo!=120)
+                    {
+                        double db = MidiMathUtils.Tick2Time(sa.AtomLength, BaseTempo);
+                        sa.AtomLength = (long)Math.Round((double)MidiMathUtils.Time2Tick(db, BaseTempo));
                     }
                     RetAtom.Add(sa);
                 }
@@ -291,8 +298,9 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
 
 
-        public void SetupCurrentPhonmem(NoteObject prevObject, NoteObject curObject, NoteObject nextObject)
+        public void SetupCurrentPhonmem(NoteObject prevObject, NoteObject curObject, NoteObject nextObject,double BaseTempo)
         {
+            if (BaseTempo <= 0) BaseTempo = 120;
             if (curObject == null) return;
             if (curObject.LockPhoneme) return;
             string prevLyric = "{R}";
@@ -312,7 +320,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                     nextLyric = nextObject.Lyric;
                 }
             }
-            List<SplitAtom> SList=GetCurrentNoteAtom(prevLyric, currentLyric, nextLyric);
+            List<SplitAtom> SList=GetCurrentNoteAtom(prevLyric, currentLyric, nextLyric, BaseTempo);
             if (curObject.PhonemeAtoms.Count == SList.Count)
             {
                 bool isSame = true;
@@ -326,6 +334,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                 }
                 if (!isSame)
                 {
+                    NoteAtomObject obj = curObject.PhonemeAtoms.Count>0?curObject.PhonemeAtoms[0]:new NoteAtomObject();
                     curObject.PhonemeAtoms.Clear();
                     for (int i = 0; i < SList.Count; i++)
                     {
@@ -337,6 +346,11 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                             nao.AtomLength = SList[i].AtomLength;
                             nao.LengthIsPercent = SList[i].LengthIsPercent;
                             nao.PhonemeAtom = SList[i].PhonemeAtom;
+                            nao.FadeInLengthMs = obj.FadeInLengthMs;
+                            nao.FadeOutLengthMs = obj.FadeOutLengthMs;
+                            nao.Flags = obj.Flags;
+                            nao.Intensity = obj.Intensity;
+                            nao.Modulation = obj.Modulation;
                             curObject.PhonemeAtoms.Add(nao);
                         }
                     }
@@ -344,6 +358,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             }
             else
             {
+                NoteAtomObject obj = curObject.PhonemeAtoms.Count > 0 ? curObject.PhonemeAtoms[0] : new NoteAtomObject();
                 curObject.PhonemeAtoms.Clear();
                 for (int i = 0; i < SList.Count; i++)
                 {
@@ -355,6 +370,11 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                         nao.AtomLength = SList[i].AtomLength;
                         nao.LengthIsPercent = SList[i].LengthIsPercent;
                         nao.PhonemeAtom = SList[i].PhonemeAtom;
+                        nao.FadeInLengthMs = obj.FadeInLengthMs;
+                        nao.FadeOutLengthMs = obj.FadeOutLengthMs;
+                        nao.Flags = obj.Flags;
+                        nao.Intensity = obj.Intensity;
+                        nao.Modulation = obj.Modulation;
                         curObject.PhonemeAtoms.Add(nao);
                     }
                 }
@@ -379,9 +399,9 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             // p2 p1 cur
             // p1 cur n1
             // cur n1 n2
-            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2]);
-            if (NoteMap[2] != null) SetupCurrentPhonmem(NoteMap[1], NoteMap[2], NoteMap[3]);
-            if (NoteMap[3] != null) SetupCurrentPhonmem(NoteMap[2], NoteMap[3], NoteMap[4]);
+            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo);
+            if (NoteMap[2] != null) SetupCurrentPhonmem(NoteMap[1], NoteMap[2], NoteMap[3], parts.Tempo);
+            if (NoteMap[3] != null) SetupCurrentPhonmem(NoteMap[2], NoteMap[3], NoteMap[4], parts.Tempo);
         }
 
         public void UpdateLyrics(ref PartsObject parts, int StartNoteIndex,int EndNoteIndex)
@@ -410,7 +430,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             }
             for (int i = StartNoteIndex; i < EndNoteIndex; i++)
             {
-                SetupCurrentPhonmem(NoteMap[i - 1], NoteMap[i], NoteMap[i + 1]);
+                SetupCurrentPhonmem(NoteMap[i - 1], NoteMap[i], NoteMap[i + 1], parts.Tempo);
             }
         }
 
@@ -442,8 +462,8 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             NoteMap[4] = EndNoteIndex + 1 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 1] : null;
             NoteMap[5] = EndNoteIndex + 2 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 2] : null;
 
-            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2]);
-            if (NoteMap[4] != null) SetupCurrentPhonmem(NoteMap[3], NoteMap[4], NoteMap[5]);
+            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo);
+            if (NoteMap[4] != null) SetupCurrentPhonmem(NoteMap[3], NoteMap[4], NoteMap[5], parts.Tempo);
         }
         public void UpdateOutboundsLyric_Aysnc(AsyncWorkCallbackHandler CallBack, ref PartsObject parts, int NoteStartIndex = 0, int NoteEndIndex = -1)
         {
