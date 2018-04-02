@@ -193,6 +193,18 @@ namespace VocalUtau.Formats.Model.Utils
         public static string AbsolutePath(string baseFolder, string absoluteTo)
         {
             if (absoluteTo == "") return "";
+            if (baseFolder != "")
+            {
+                string TestFolder = baseFolder + "\\" + absoluteTo;
+                if (System.IO.File.Exists(TestFolder))
+                {
+                    return (new System.IO.FileInfo(TestFolder)).FullName;
+                }
+                if (System.IO.Directory.Exists(TestFolder))
+                {
+                    return (new System.IO.DirectoryInfo(TestFolder)).FullName;
+                }
+            }
             if (absoluteTo.Length > 3)
             {
                 char c1 = absoluteTo.ToLower()[0];

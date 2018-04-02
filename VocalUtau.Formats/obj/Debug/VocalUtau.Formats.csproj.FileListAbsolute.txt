@@ -18,3 +18,4 @@ D:\VocalUtau\IncludeLib\VocalUtau.Formats\VocalUtau.Formats\bin\Debug\ICSharpCod
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\VocalUtau.Formats\bin\Debug\NUniversalCharDet.dll
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\VocalUtau.Formats\bin\Debug\DeepCloner.xml
 D:\VocalUtau\IncludeLib\VocalUtau.Formats\VocalUtau.Formats\obj\Debug\VocalUtau.Formats.csprojResolveAssemblyReference.cache
+D:\VocalUtau\IncludeLib\VocalUtau.Formats\VocalUtau.Formats\bin\Debug\NAudio.dll

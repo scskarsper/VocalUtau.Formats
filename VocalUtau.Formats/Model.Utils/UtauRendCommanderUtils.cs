@@ -164,8 +164,14 @@ namespace VocalUtau.Formats.Model.Utils
         }
         public static string[] GetResamplerArg(ResamplerArgs Args)
         {
-            double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
-            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + PreUttrOverlapsMs));
+            if (Args.InputWavfile.IndexOf("shi_shi_shi.wav") > 0)
+            {
+                double dr = 0;
+                dr = 1;
+            }
+            double TickDebetMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
+            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + (TickDebetMs < 0 ? 0 : TickDebetMs)));
+
             string[] resampler_arg_suffix = new string[]{
                         "\"" + Args.InputWavfile +"\"",
                         "\"" + Args.OutputFile+"\"",
@@ -225,17 +231,17 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _tempo = value; }
             }
 
-            long _fadeInLengthMs = 5;
+            double _fadeInLengthMs = 5;
 
-            public long FadeInLengthMs
+            public double FadeInLengthMs
             {
                 get { return _fadeInLengthMs; }
                 set { _fadeInLengthMs = value; }
             }
 
-            long _fadeOutLengthMs = 35;
+            double _fadeOutLengthMs = 35;
 
-            public long FadeOutLengthMs
+            public double FadeOutLengthMs
             {
                 get { return _fadeOutLengthMs; }
                 set { _fadeOutLengthMs = value; }
@@ -249,13 +255,13 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _volumePercentInt = value; }
             }
 
-            SortedDictionary<long, long> _EnvlopePoints = new SortedDictionary<long, long>();
+            SortedDictionary<double, long> _EnvlopePoints = new SortedDictionary<double, long>();
 
-            public SortedDictionary<long, long> EnvlopePoints
+            public SortedDictionary<double, long> EnvlopePoints
             {
                 get
                 {
-                    if (_EnvlopePoints == null) _EnvlopePoints = new SortedDictionary<long, long>();
+                    if (_EnvlopePoints == null) _EnvlopePoints = new SortedDictionary<double, long>();
                     return _EnvlopePoints;
                 }
                 set { _EnvlopePoints = value; }
@@ -312,9 +318,9 @@ namespace VocalUtau.Formats.Model.Utils
             }
             double PreUttrOverlapsMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
             long TotalLength = (long)Math.Ceiling(MidiMathUtils.Tick2Time((long)Args.TickLength, Args.Tempo) * 1000 + PreUttrOverlapsMs);
-            long EnvStart = Args.FadeInLengthMs;
-            long EnvEnd = TotalLength-Args.FadeOutLengthMs;
-            SortedDictionary<long,long> TargetEnvlope=new SortedDictionary<long,long>();
+            double EnvStart = Args.FadeInLengthMs;
+            double EnvEnd = TotalLength - Args.FadeOutLengthMs;
+            SortedDictionary<double, long> TargetEnvlope = new SortedDictionary<double, long>();
             double vpcp = (double)Args.VolumePercentInt / 100.0;
             if (TotalLength == 0)
             {
@@ -326,7 +332,7 @@ namespace VocalUtau.Formats.Model.Utils
                 TargetEnvlope.Add(0, 0);
                 TargetEnvlope.Add(TotalLength, 0);
                 long LastVol = 100;
-                foreach (KeyValuePair<long, long> sortEnv in Args.EnvlopePoints)
+                foreach (KeyValuePair<double, long> sortEnv in Args.EnvlopePoints)
                 {
                     if (sortEnv.Key == EnvStart)
                     {
@@ -362,27 +368,27 @@ namespace VocalUtau.Formats.Model.Utils
                     if (!TargetEnvlope.ContainsKey(EnvEnd)) TargetEnvlope.Add(EnvEnd, (long)(LastVol * vpcp));
                 }
             }
-            string P2=Args.FadeInLengthMs.ToString();
-            string P3=Args.FadeOutLengthMs.ToString();
+            string P2=Math.Round(Args.FadeInLengthMs,1).ToString();
+            string P3=Math.Round(Args.FadeOutLengthMs,1).ToString();
             string V2=(TargetEnvlope[Args.FadeInLengthMs]*vpcp).ToString();
             string V3=(TargetEnvlope[TotalLength - Args.FadeOutLengthMs]*vpcp).ToString();
             List<string> wavtool_arg_suffix = new List<string>{
                         "\"" + Args.OutputWavfile +"\"",
                         "\"" + Args.InputWavfile +"\"",
-                        "" + Args.StartPointMs.ToString() + "",
-                        "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Abs(PreUttrOverlapsMs).ToString(),
+                        "" + Math.Round(Args.StartPointMs,3).ToString() + "",
+                        "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Round(Math.Abs(PreUttrOverlapsMs),3).ToString(),
                         //P1,P2,P3
                         "0",
                         P2,
                         P3,
                         //V1,V2,V3,V4
                         "0",V2,V3,"0",
-                        Args.ThisPreutterOverlapsArgs.OverlapMs.ToString(),
+                        Math.Round(Args.ThisPreutterOverlapsArgs.OverlapMs,3).ToString(),
                         //P4
                         "0"
             };
-            long lastMs = Args.FadeInLengthMs;
-            foreach (KeyValuePair<long, long> sortEnv in TargetEnvlope)
+            double lastMs = Args.FadeInLengthMs;
+            foreach (KeyValuePair<double, long> sortEnv in TargetEnvlope)
             {
                 if (sortEnv.Key >= EnvEnd) break;
                 if (sortEnv.Key <= EnvStart)
@@ -390,9 +396,9 @@ namespace VocalUtau.Formats.Model.Utils
                     lastMs = sortEnv.Key;
                     continue;
                 }
-                long dert = sortEnv.Key - lastMs;
+                double dert = sortEnv.Key - lastMs;
                 lastMs = sortEnv.Key;
-                wavtool_arg_suffix.Add(dert.ToString());
+                wavtool_arg_suffix.Add(Math.Round(dert,1).ToString());
                 wavtool_arg_suffix.Add(((long)(sortEnv.Value * vpcp)).ToString());
             }
 

@@ -9,7 +9,7 @@ namespace VocalUtau.Formats.Model.Utils
     {
         public static int Resampler_SortNear50(int BeBoundInteger)
         {
-            int BaseInteger = BeBoundInteger + 50;
+            int BaseInteger = Math.Abs(BeBoundInteger) + 50;
             double RoundInteger = BaseInteger / 50;
             double RoundFloat = BaseInteger % 50;
             int Return = (int)RoundInteger * 50;
