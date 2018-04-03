@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using VocalUtau.Formats.Model.Utils;
 using VocalUtau.Formats.Model.VocalObject;
 
@@ -104,10 +105,13 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
         private List<string> GetAtomItem(string Lyric)
         {
-            List<string> GetRet = new List<string>();
+            List<string> GetRet = new List<string>();            
             try
             {
-                GetRet = _NoteAtomMap[Lyric];
+                if(_NoteAtomMap.ContainsKey(Lyric))
+                {
+                    GetRet = _NoteAtomMap[Lyric];
+                }
             }
             catch { ;}
             return GetRet;
@@ -298,7 +302,7 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
 
 
 
-        public void SetupCurrentPhonmem(NoteObject prevObject, NoteObject curObject, NoteObject nextObject,double BaseTempo)
+        public void SetupCurrentPhonmem(NoteObject prevObject, NoteObject curObject, NoteObject nextObject,double BaseTempo, bool UseLyricDictionary)
         {
             if (BaseTempo <= 0) BaseTempo = 120;
             if (curObject == null) return;
@@ -320,7 +324,17 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                     nextLyric = nextObject.Lyric;
                 }
             }
-            List<SplitAtom> SList=GetCurrentNoteAtom(prevLyric, currentLyric, nextLyric, BaseTempo);
+            List<SplitAtom> SList = null;
+            if (UseLyricDictionary)
+            {
+                SList = GetCurrentNoteAtom(prevLyric, currentLyric, nextLyric, BaseTempo);
+            }
+            else
+            {
+                SplitAtom sa = new SplitAtom();
+                sa.PhonemeAtom = currentLyric;
+                SList = new List<SplitAtom>() { sa };
+            }
             if (curObject.PhonemeAtoms.Count == SList.Count)
             {
                 bool isSame = true;
@@ -399,9 +413,9 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             // p2 p1 cur
             // p1 cur n1
             // cur n1 n2
-            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo);
-            if (NoteMap[2] != null) SetupCurrentPhonmem(NoteMap[1], NoteMap[2], NoteMap[3], parts.Tempo);
-            if (NoteMap[3] != null) SetupCurrentPhonmem(NoteMap[2], NoteMap[3], NoteMap[4], parts.Tempo);
+            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo, parts.UseLyricDicitonary);
+            if (NoteMap[2] != null) SetupCurrentPhonmem(NoteMap[1], NoteMap[2], NoteMap[3], parts.Tempo, parts.UseLyricDicitonary);
+            if (NoteMap[3] != null) SetupCurrentPhonmem(NoteMap[2], NoteMap[3], NoteMap[4], parts.Tempo, parts.UseLyricDicitonary);
         }
 
         public void UpdateLyrics(ref PartsObject parts, int StartNoteIndex,int EndNoteIndex)
@@ -428,10 +442,14 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
                     if (i < parts.NoteList.Count) { NoteMap.Add(i, parts.NoteList[i]); cnt++; }
                 }
             }
-            for (int i = StartNoteIndex; i < EndNoteIndex; i++)
-            {
-                SetupCurrentPhonmem(NoteMap[i - 1], NoteMap[i], NoteMap[i + 1], parts.Tempo);
-            }
+            double Tempo = parts.Tempo;
+            bool useLyricSplitDic = parts.UseLyricDicitonary;
+            Parallel.For(StartNoteIndex,EndNoteIndex,(i)=>{
+            // (int i = StartNoteIndex; i < EndNoteIndex; i++)
+            //{
+                SetupCurrentPhonmem(NoteMap[i - 1], NoteMap[i], NoteMap[i + 1], Tempo, useLyricSplitDic);
+            //}
+            });
         }
 
         public void UpdateLyrics_Aysnc(AsyncWorkCallbackHandler CallBack, ref PartsObject parts, int NoteStartIndex = 0, int NoteEndIndex = -1)
@@ -462,8 +480,8 @@ namespace VocalUtau.Formats.Model.Database.VocalDatabase
             NoteMap[4] = EndNoteIndex + 1 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 1] : null;
             NoteMap[5] = EndNoteIndex + 2 < parts.NoteList.Count ? parts.NoteList[EndNoteIndex + 2] : null;
 
-            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo);
-            if (NoteMap[4] != null) SetupCurrentPhonmem(NoteMap[3], NoteMap[4], NoteMap[5], parts.Tempo);
+            if (NoteMap[1] != null) SetupCurrentPhonmem(NoteMap[0], NoteMap[1], NoteMap[2], parts.Tempo, parts.UseLyricDicitonary);
+            if (NoteMap[4] != null) SetupCurrentPhonmem(NoteMap[3], NoteMap[4], NoteMap[5], parts.Tempo, parts.UseLyricDicitonary);
         }
         public void UpdateOutboundsLyric_Aysnc(AsyncWorkCallbackHandler CallBack, ref PartsObject parts, int NoteStartIndex = 0, int NoteEndIndex = -1)
         {

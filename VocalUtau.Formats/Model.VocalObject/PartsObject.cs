@@ -96,6 +96,15 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { _SingerGUID = value; }
         }
 
+        bool _LyricDicitonary = true;
+
+        [DataMember]
+        public bool UseLyricDicitonary
+        {
+            get { return _LyricDicitonary; }
+            set { _LyricDicitonary = value; }
+        }
+
         string _PartName = "";
 
         [DataMember]
