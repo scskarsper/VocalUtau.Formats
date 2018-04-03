@@ -156,6 +156,23 @@ namespace VocalUtau.Formats.Model.Utils
                 get { return _nextPreutterOverlapsArgs; }
                 set { _nextPreutterOverlapsArgs = value; }
             }
+
+
+            VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs _thisRealPreutterOverlapsArgs = null;
+
+            public VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs ThisRealPreutterOverlapsArgs
+            {
+                get { if (_thisRealPreutterOverlapsArgs == null) return ThisPreutterOverlapsArgs; return _thisRealPreutterOverlapsArgs; }
+                set { _thisRealPreutterOverlapsArgs = value; }
+            }
+
+            VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs _nextRealPreutterOverlapsArgs = null;
+
+            public VocalUtau.Formats.Model.Database.VocalDatabase.SoundAtom.PreUtterOverlapArgs NextRealPreutterOverlapsArgs
+            {
+                get { if (_nextRealPreutterOverlapsArgs == null) return NextPreutterOverlapsArgs; return _nextRealPreutterOverlapsArgs; }
+                set { _nextRealPreutterOverlapsArgs = value; }
+            }
         }
 
         public static string GetResamplerArgStr(ResamplerArgs Args)
@@ -170,7 +187,8 @@ namespace VocalUtau.Formats.Model.Utils
                 dr = 1;
             }
             double TickDebetMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
-            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + (TickDebetMs < 0 ? 0 : TickDebetMs)));
+            double FixedMillisecLengthBase = MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 +Args.ThisPreutterOverlapsArgs.PreUtterance - Args.NextRealPreutterOverlapsArgs.PreUtterance + Args.NextRealPreutterOverlapsArgs.OverlapMs;
+            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)FixedMillisecLengthBase);//Fixed.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + (TickDebetMs < 0 ? 0 : TickDebetMs)));
 
             string[] resampler_arg_suffix = new string[]{
                         "\"" + Args.InputWavfile +"\"",
