@@ -123,7 +123,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
         public string getResampler(string Default)
         {
-            if (_PartResampler != "") return _PartResampler;
+            if (_PartResampler != "" && _PartResampler!= null) return _PartResampler;
             return Default;
         }
 
