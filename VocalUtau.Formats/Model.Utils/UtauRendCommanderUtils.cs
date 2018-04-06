@@ -8,7 +8,7 @@ namespace VocalUtau.Formats.Model.Utils
 {
     public class UtauRendCommanderUtils
     {
-
+        [Serializable]
         public class ResamplerArgs
         {
             public ResamplerArgs(SoundAtom basedAtom, string OutputFilePath, double Tempo, long TickLength, string Note, double Moduration = 0, double Intensity = 100)
@@ -207,6 +207,7 @@ namespace VocalUtau.Formats.Model.Utils
             return resampler_arg_suffix;
         }
 
+        [Serializable]
         public class WavtoolArgs
         {
             string _outputWavfile = "";
