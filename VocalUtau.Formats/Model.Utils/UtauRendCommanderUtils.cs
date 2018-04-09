@@ -315,7 +315,7 @@ namespace VocalUtau.Formats.Model.Utils
                 "\"" + Args.OutputWavfile +"\"",
                 "\"R.wav\"",
                 "0",
-                "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Abs(PreUttrOverlapsMs).ToString(),
+                "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Abs(PreUttrOverlapsMs).ToString("########.0##"),
                         //P1,P2,P3
                         "0",
                         "0",
@@ -395,7 +395,7 @@ namespace VocalUtau.Formats.Model.Utils
                         "\"" + Args.OutputWavfile +"\"",
                         "\"" + Args.InputWavfile +"\"",
                         "" + Math.Round(Args.StartPointMs,3).ToString() + "",
-                        "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Round(Math.Abs(PreUttrOverlapsMs),3).ToString(),
+                        "" + Args.TickLength.ToString() + "@" +Args.Tempo.ToString()+(PreUttrOverlapsMs>=0?"+":"-")+Math.Round(Math.Abs(PreUttrOverlapsMs),3).ToString("########.0##"),
                         //P1,P2,P3
                         "0",
                         P2,
