@@ -125,7 +125,11 @@ namespace VocalUtau.Formats.Model.BaseObject
             {
                 lock (locker)
                 {
-                    _baseList.Add(TV, value);
+                    try
+                    {
+                        _baseList.Add(TV, value);
+                    }
+                    catch { ;}
                 }
             }
         }
