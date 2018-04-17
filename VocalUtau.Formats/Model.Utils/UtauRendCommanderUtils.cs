@@ -58,6 +58,14 @@ namespace VocalUtau.Formats.Model.Utils
                 set { _tickLength = value; }
             }
 
+            int _ConsonantVelocity = 100;
+
+            public int ConsonantVelocity
+            {
+                get { return _ConsonantVelocity; }
+                set { _ConsonantVelocity = value; }
+            }
+
             string _Flags = "";
 
             public string Flags
@@ -186,19 +194,31 @@ namespace VocalUtau.Formats.Model.Utils
                 double dr = 0;
                 dr = 1;
             }
+
+            
+             //子音伸缩率
+             int vel = Args.ConsonantVelocity;//Vel子音速度
+             if (vel > 1000) vel = 1000;
+             if (vel < 0) vel = 0;
+             double velj = Math.Pow(2, (1 - ((int)vel / 100)));
+             double FixedConsonantLengthMs=Args.FixedConsonantLengthMs*velj;
+             double SoundStartMs = Args.SoundStartMs * velj;
+             
+
             double TickDebetMs = UtauToolUtils.Global_GenerateGlobalPlusTimeMs(Args.ThisPreutterOverlapsArgs, Args.NextPreutterOverlapsArgs);
             double FixedMillisecLengthBase = MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 +Args.ThisPreutterOverlapsArgs.PreUtterance - Args.NextRealPreutterOverlapsArgs.PreUtterance + Args.NextRealPreutterOverlapsArgs.OverlapMs;
-            double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)FixedMillisecLengthBase);//Fixed.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + (TickDebetMs < 0 ? 0 : TickDebetMs)));
-
+         //   double FixedMillisecLength = UtauToolUtils.Resampler_SortNear50((int)FixedMillisecLengthBase);//Fixed.Resampler_SortNear50((int)(MidiMathUtils.Tick2Time((long)(Args.TickLength), Args.Tempo) * 1000 + (TickDebetMs < 0 ? 0 : TickDebetMs)));
+            double FixedMillisecLength2 = UtauToolUtils.Resampler_SortNear50((int)(FixedMillisecLengthBase + SoundStartMs));
+          
             string[] resampler_arg_suffix = new string[]{
                         "\"" + Args.InputWavfile +"\"",
                         "\"" + Args.OutputFile+"\"",
                         "" + Args.Note + "",
-                        "100",//<==VEL
+                        vel.ToString(),//<==VEL
                         "\"" + Args.Flags + "\"",
-                        (Args.SoundStartMs).ToString("0.0###") + "",
-                        FixedMillisecLength.ToString() + "",
-                        Args.FixedConsonantLengthMs.ToString("0.0###") + "",
+                        (SoundStartMs).ToString("0.0###") + "", //Args.SoundStartMs
+                        FixedMillisecLength2.ToString() + "", //FixedMillisecLength
+                        FixedConsonantLengthMs.ToString("0.0###") + "", //Args.FixedConsonantLengthMs
                         Args.FixedReleasingLengthMs.ToString("0.0###") + "",
                         Args.Intensity.ToString() + "",
                         Args.Moduration.ToString() + "",

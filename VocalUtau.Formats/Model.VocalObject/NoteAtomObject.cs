@@ -116,7 +116,28 @@ namespace VocalUtau.Formats.Model.VocalObject
         public double Velocity
         {
             get { return _Velocity; }
-            set { _Velocity = value; }
+            set { 
+            if (double.IsNaN(value))
+            {
+                _Velocity = value;
+            }
+            else if (double.IsInfinity(value))
+            {
+                _Velocity = double.NaN;
+            }
+            else if (value > 1000)
+            {
+                _Velocity = 1000;
+            }
+            else if (value < 0)
+            {
+                _Velocity = 0;
+            }
+            else
+            {
+                _Velocity = (int)value;
+            }
+            }
         }
 
         //List<KeyValuePair<double, double>> _Envelopes = new List<KeyValuePair<double, double>>();

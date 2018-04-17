@@ -98,6 +98,15 @@ namespace VocalUtau.Formats.Model.VocalObject
             }
         }
 
+        int _GlobalVolume = 100;
+
+        [DataMember]
+        public int GlobalVolume
+        {
+            get { return _GlobalVolume; }
+            set { _GlobalVolume = value; if (_GlobalVolume < 0)_GlobalVolume = 0; if (_GlobalVolume > 1000)_GlobalVolume = 1000; }
+        }
+
         public void InitEmpty()
         {
             this.BackerList.Clear();
@@ -110,6 +119,7 @@ namespace VocalUtau.Formats.Model.VocalObject
             this.BackerList[0].WavPartList[0].PartName = "UnnamedWavPart";
             this.BackerList[0].WavPartList[0].DuringTime = 1;
             this.SingerList.Clear();
+            this.GlobalVolume = 100;
         }
 
         public double Tick2Time(long Tick)
