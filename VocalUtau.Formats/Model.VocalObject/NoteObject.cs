@@ -146,6 +146,35 @@ namespace VocalUtau.Formats.Model.VocalObject
             set { if (value > 1)_VerbPrecent = 1; else if (value < 0)_VerbPrecent = 0; else  _VerbPrecent = value; }
         }
 
+        /// <summary>
+        /// 周期：Sin周期，以pi/2为界（不做非0点
+        /// Step=Cycle/2
+        /// Func(x)=Range*Sin((pi/Step)*(x-VerbSt)) 
+        /// </summary>
+        private List<PercentControlObject> _VerbCycle = new List<PercentControlObject>();
+
+        [DataMember]
+        public List<PercentControlObject> VerbCycle
+        {
+            get { if (_VerbCycle == null)_VerbCycle = new List<PercentControlObject>(); if (_VerbCycle.Count == 0)_VerbCycle.Add(new PercentControlObject(0, 240)); return _VerbCycle; }
+            set { _VerbCycle = value; }
+        }
+
+        /// <summary>
+        /// 振幅：1个音高（以中心+-0.5)
+        /// </summary>
+        private List<PercentControlObject> _VerbRange = new List<PercentControlObject>();
+
+        [DataMember]
+        public List<PercentControlObject> VerbRange
+        {
+            get { if (_VerbRange == null)_VerbRange = new List<PercentControlObject>(); if (_VerbRange.Count == 0)_VerbRange.Add(new PercentControlObject(0, 1)); return _VerbRange; }
+            set { _VerbRange = value; }
+        }
+
+
+        [IgnoreDataMember]
+        public bool VerbChanged { get; set; }
 
         public void InitNote()
         {

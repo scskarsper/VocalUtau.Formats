@@ -237,7 +237,7 @@ namespace VocalUtau.Formats.Model.VocalObject
 
         List<NoteObject> _NoteList = new List<NoteObject>();
         TickSortList<PitchObject> _PitchList = new TickSortList<PitchObject>();
-        private TickSortList<ControlObject> _DynList = new TickSortList<ControlObject>();
+        private TickSortList<TickControlObject> _DynList = new TickSortList<TickControlObject>();
         TickSortList<PitchObject> _BasePitchList = new TickSortList<PitchObject>();
 
         [IgnoreDataMember]
@@ -255,7 +255,7 @@ namespace VocalUtau.Formats.Model.VocalObject
         }
 
         [DataMember]
-        public TickSortList<ControlObject> DynList
+        public TickSortList<TickControlObject> DynList
         {
             get { return _DynList; }
             set { _DynList = value; }

@@ -92,13 +92,14 @@
     <Compile Include="Model.VocalObject\ParamTranslater\NoteCompiler.cs" />
     <Compile Include="Model.VocalObject\ParamTranslater\PitchCompiler.cs" />
     <Compile Include="Model.VocalObject\PartsObject.cs" />
+    <Compile Include="Model.VocalObject\PercentControlObject.cs" />
     <Compile Include="Model.VocalObject\PitchObject.cs" />
     <Compile Include="Model.VocalObject\PitchAtomObject.cs" />
     <Compile Include="Model.VocalObject\ProjectObject.cs" />
     <Compile Include="Model.VocalObject\SingerObject.cs" />
     <Compile Include="Model.VocalObject\TrackerObject.cs" />
     <Compile Include="Model.VocalObject\WavePartsObject.cs" />
-    <Compile Include="Model.VocalObject\ControlObject.cs" />
+    <Compile Include="Model.VocalObject\TickControlObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

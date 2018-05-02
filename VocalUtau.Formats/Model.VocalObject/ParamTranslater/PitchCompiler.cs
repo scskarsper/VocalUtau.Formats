@@ -13,10 +13,12 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
     {
         //ISSUE：PITCH该问Dictionary存储，加快检索和删除速度
         Dictionary<long, double> BaseCache = new Dictionary<long, double>();
+        Dictionary<long, double> VerbCache = new Dictionary<long, double>();
         Dictionary<long, double> PitchCache = new Dictionary<long, double>();
         public void ClearCache()
         {
             BaseCache.Clear();
+            VerbCache.Clear();
             PitchCache.Clear();
         }
 
@@ -56,6 +58,12 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
             }
             return EndTick;
         }
+        private long GetVerbStart(int NoteIndex)
+        {
+            NoteObject no = partsObject.NoteList[NoteIndex];
+            long verbLen = (long)((double)partsObject.NoteList[NoteIndex].Length * no.VerbPrecent);
+            return no.Tick + no.Length - verbLen;
+        }
         private long GetNoteStart(int NoteIndex)
         {
             long StartTick=partsObject.NoteList[NoteIndex].Tick;
@@ -65,6 +73,49 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
         {
             return partsObject.NoteList[NoteIndex].PitchValue.PitchValue;
         }
+
+        void SetupVerb(int NoteIndex,long NoteRendEnd=long.MaxValue)
+        {
+            NoteObject no = partsObject.NoteList[NoteIndex];
+            NoteObject no1 = null;
+            if(NoteIndex<partsObject.NoteList.Count-1)no1=partsObject.NoteList[NoteIndex + 1];
+
+            long VerbSt = GetVerbStart(NoteIndex);
+            if (no1 != null)
+            {
+                if (no1.Tick <= VerbSt) return;
+            }
+            long VerbEd = Math.Min(GetNoteEnd(NoteIndex),NoteRendEnd);
+            long VerbLen=VerbEd - VerbSt;
+
+            List<PitchObject> src = new List<PitchObject>();
+
+            double CycleStep = no.VerbCycle[0].Value / 2.0;
+            double Rage = no.VerbRange[0].Value / 2.0;
+
+            VerbLen = (long)(Math.Floor((double)VerbLen / CycleStep) * CycleStep);
+            VerbSt=TickSortList<PitchObject>.TickFormat(VerbSt);
+            VerbEd=VerbSt+VerbLen;
+
+            /// Step=Cycle/2
+            /// Func(x)=Range*Sin((pi/Step)*x) 
+            for (long i = VerbSt; i < VerbEd; i = i + TickSortList<PitchObject>.TickStep)
+            {
+                double BaseSpd = no.Pitch;// getBasePitch(i);
+                src.Add(new PitchObject(i, BaseSpd + Rage * Math.Sin((Math.PI / CycleStep) * (i - VerbSt))));
+                //VerbCache.Add(i,Rage * Math.Sin((Math.PI / CycleStep) * (i - VerbSt)));
+            }
+
+            for (int i = 0; i < src.Count; i++)
+            {
+                if(i<NoteRendEnd)
+                {
+                     partsObject.BasePitchList.Add(src[i]);
+                }
+            }
+        }
+
+
         public void SetupBasePitch(int NoteStartIndex = 0, int NoteEndIndex = -1)
         {
             if (partsObject.BasePitchList == null) partsObject.BasePitchList = new TickSortList<PitchObject>();
@@ -125,6 +176,10 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     {
                         AddTransPart(NoteEndIndex, NoteEndIndex + 1, true);
                     }
+                    else
+                    {
+                        SetupVerb(i);
+                    }
                 }
             };       
             Console.WriteLine("FilledLine:{0}", watch.Elapsed);
@@ -148,6 +203,11 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                 SetupBasePitch(partsObject.NoteList.Count - 1, partsObject.NoteList.Count - 1);
                 return;
             }
+
+         //   for (int i = NoteStartIndex; i <= NoteEndIndex; i++)
+        //    {
+         //   }
+
             ClearCache();
             Console.WriteLine("End:{0}", watch.Elapsed);
             watch.Stop();
@@ -177,10 +237,12 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     tmp.Add(new PitchObject(NNS, p2));
                     tmp.Add(new PitchObject(TEnd, p2));
                     partsObject.BasePitchList.AddRange(tmp);
+                    SetupVerb(preObjIndex);
                 }
                 else
                 {
                     partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                    SetupVerb(preObjIndex,TStart);
                 }
             }
             else
@@ -203,10 +265,12 @@ namespace VocalUtau.Formats.Model.VocalObject.ParamTranslater
                     tmp.Add(new PitchObject(NNS, p2));
                     tmp.Add(new PitchObject(TEnd, p2));
                     partsObject.BasePitchList.AddRange(tmp);
+                    SetupVerb(preObjIndex);
                 }
                 else
                 {
                     partsObject.BasePitchList.AddRange(CalcGraphS(new PitchObject(TStart, GetNotePitchValue(preObjIndex)), new PitchObject(TEnd, GetNotePitchValue(nxtObjIndex))));
+                    SetupVerb(preObjIndex, TStart);
                 }
                 for (long i = TEnd+1; i <= TPEnd; i++)
                 {
